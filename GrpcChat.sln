@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcChat", "GrpcChat\GrpcChat.csproj", "{925131EB-DB63-4BAE-847F-C5E7D5FA3905}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcChatProto", "GrpcChatProto\GrpcChatProto.csproj", "{05FC8419-F227-413F-8989-D7E786689E23}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcChatServer", "GrpcChatServer\GrpcChatServer.csproj", "{EDD33A88-A345-486C-AA2E-959205689315}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecondGrpcChat", "SecondGrpcChat\SecondGrpcChat.csproj", "{27CDCFA7-8051-4829-BDFD-13359D5D9A53}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{925131EB-DB63-4BAE-847F-C5E7D5FA3905}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{925131EB-DB63-4BAE-847F-C5E7D5FA3905}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{925131EB-DB63-4BAE-847F-C5E7D5FA3905}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{925131EB-DB63-4BAE-847F-C5E7D5FA3905}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05FC8419-F227-413F-8989-D7E786689E23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05FC8419-F227-413F-8989-D7E786689E23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05FC8419-F227-413F-8989-D7E786689E23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05FC8419-F227-413F-8989-D7E786689E23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDD33A88-A345-486C-AA2E-959205689315}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDD33A88-A345-486C-AA2E-959205689315}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDD33A88-A345-486C-AA2E-959205689315}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDD33A88-A345-486C-AA2E-959205689315}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27CDCFA7-8051-4829-BDFD-13359D5D9A53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27CDCFA7-8051-4829-BDFD-13359D5D9A53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27CDCFA7-8051-4829-BDFD-13359D5D9A53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27CDCFA7-8051-4829-BDFD-13359D5D9A53}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
