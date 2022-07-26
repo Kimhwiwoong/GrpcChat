@@ -66,6 +66,7 @@ message RoomResponse {
   oneof response {
     EnterResponse enter = 1;
     ChatMessage chat = 2;
+    FailedResponse failed = 3;
   }
 }
 

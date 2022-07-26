@@ -1,4 +1,3 @@
-using System.Text;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
@@ -146,7 +145,12 @@ public class Room
     {
         while (await _call.ResponseStream.MoveNext())
         {
-            OnMessage?.Invoke(_call.ResponseStream.Current.Chat.Message);
+            if (_call.ResponseStream.Current.ResponseCase is not RoomResponse.ResponseOneofCase.Failed)
+            {
+                OnMessage?.Invoke(_call.ResponseStream.Current.Chat.Message);
+                continue;
+            }
+            OnMessage?.Invoke(_call.ResponseStream.Current.Failed.Reason);
         }
     }
 

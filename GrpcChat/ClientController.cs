@@ -150,7 +150,8 @@ public class ClientController
             while (true)
             {
                 var line = Console.ReadLine();
-
+                
+                // Do not any message to server -> server can't know user quit chatting room.
                 if (line == "quit")
                     break;
                 

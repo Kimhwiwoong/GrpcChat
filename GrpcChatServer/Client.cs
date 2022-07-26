@@ -1,5 +1,3 @@
-using Grpc.Core;
-
 namespace GrpcChatServer;
 
 public class Client
@@ -8,11 +6,14 @@ public class Client
     {
         Peer = peer;
         Name = name;
-        JoinedRoom = "";
+    }
+
+    public void Send(string chatMsg)
+    {
+        OnSend?.Invoke(chatMsg);
     }
 
     public string Peer { get; }
-    public string JoinedRoom { get; set; }
     public string Name { get; set; }
-    //public IServerStreamWriter<ChatMessage>? ClientStreamWriter { get; set; }
+    public event Action<string>? OnSend;
 }

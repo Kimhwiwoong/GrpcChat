@@ -1,94 +1,107 @@
+using System.Collections.Concurrent;
+using Grpc.Core;
+
 namespace GrpcChatServer;
 
-public class ServerService
+public class ServerService 
 {
+    private readonly ConcurrentDictionary<string, Client> _clientList = new();
+    private readonly ConcurrentDictionary<string, ChatRoom> _chatRoomList = new();
+    public event Action? ChatEvent;
+
+    private bool NicknameAlready(string target)
+    {
+        return _clientList.Any(sameName => sameName.Key.Equals(target));
+    }
     
+    private bool RoomNameAlready(string target)
+    {
+        return _chatRoomList.Any(sameName => sameName.Key.Equals(target));
+    }
+
+    public string Enroll(string peer)
+    {
+        // When nickname is unique, add client to list and return client's nickname 
+        var nickname = $"user{new Random().Next(1, int.MaxValue)}";
+        while (NicknameAlready(nickname))
+        {
+            nickname = $"user{new Random().Next(1, int.MaxValue)}";
+        }
+        var client = new Client(peer, nickname);
+
+        _clientList.TryAdd(nickname, client);
+
+        return nickname;
+    }
+    
+    public bool ChangeNick(string newName, string oldName)
+    {
+        if (NicknameAlready(newName))
+        {
+            // Fail -> return false
+            return false;
+        }
+        // Success -> change nickname and return true
+        var target = _clientList.Values.First(client => client.Name.Equals(oldName));
+        target.Name = newName;
+        
+        return true;
+    }
+
+    public bool CreateRoom(string name)
+    {
+        if (RoomNameAlready(name))
+        {
+            // Fail -> return false
+            return false;
+        }
+        // Success -> create room and return true
+        var newRoom = new ChatRoom(name);
+        _chatRoomList.TryAdd(name, newRoom);
+        
+        return true;
+    }
+
+    public IEnumerable<string> ShowRooms()
+    {
+        var names = _chatRoomList.Values.Select(room => $"{room.Name} ({room.ParticipantsCount()})");
+    
+        // if (ChatRoomManger.TryCreateRoom("", out var room))
+        // {
+        //     room
+        // }
+        
+        return names;
+    }
+
+    public void JoinClientToRoom(ChatRoom room, string peer)
+    {
+        var currentClient = _clientList.Values.First(client => client.Peer.Equals(peer));
+
+        room.Enter(peer, currentClient);
+        
+        Console.WriteLine($"Client {currentClient.Name} entered room {room.Name}.");
+    }
+
+    public void BroadCast()
+    {
+        ChatEvent?.Invoke();
+    }
+
+    public Client GetCurrentClient(string peer)
+    {
+        return _clientList.Values.First(client => client.Peer.Equals(peer));
+    }
+
+    public ChatRoom? GetCurrentRoom(string name)
+    {
+        return _chatRoomList.Values.FirstOrDefault(room => room.Name.Equals(name));
+    }
+
+    // public static IEnumerable<IServerStreamWriter<RoomResponse>> GetOtherClients(ChatRoom room, string peer)
+    // {
+    //     var writerList = room.StreamList.Where(writers => writers.Key != peer)
+    //         .Select(writer => writer.Value);
+    //     return writerList;
+    // }
 }
-// public override async Task EnterRoom(IAsyncStreamReader<RoomRequest> requestStream,
-//         IServerStreamWriter<RoomResponse> responseStream, ServerCallContext context)
-//     {
-//         ChatRoom? currentRoom = null;
-//         var currentClient = _clientList.Values.First(client => client.Peer.Equals(context.Peer));
-//         // var room = _chatRoomList.Values.FirstOrDefault(room => room.Name.Equals(roomName));
-//         while (await requestStream.MoveNext())
-//         {
-//             switch (requestStream.Current.RequestCase)
-//             {
-//                 case RoomRequest.RequestOneofCase.Chat:
-//                     if (currentRoom is null)
-//                         throw new InvalidOperationException();
-//
-//                     var chat = requestStream.Current.Chat;
-//
-//                     var reply = new RoomResponse
-//                     {
-//                         Chat = new ChatMessage
-//                         {
-//                             Message = $"[{DateTime.Now:yyyy-MM-dd hh:mm:ss tt}] {currentClient.Name} : {chat.Message}",
-//                             RoomName = "useless"
-//                         }
-//                     };
-//
-//                     foreach (var writer in currentRoom.StreamList)
-//                     {
-//                         if (writer.Value != responseStream)
-//                         {
-//                             await writer.Value.WriteAsync(reply);
-//                         }
-//                     }
-//
-//                     break;
-//                 
-//                 // When client entered room.
-//                 // Add streamwriter in streamlist.
-//                 // Add client information in _clients.
-//                 case RoomRequest.RequestOneofCase.Enter:
-//                     var roomName = requestStream.Current.Enter.RoomName;
-//                     var room = _chatRoomList.Values.FirstOrDefault(room => room.Name.Equals(roomName));
-//
-//                     if (room is null)
-//                     {
-//                         await responseStream.WriteAsync(
-//                             new RoomResponse
-//                             {
-//                                 Enter = new EnterResponse
-//                                 {
-//                                     Failed = new FailedResponse { Reason = "not Found" }
-//                                 }
-//                             });
-//                         return;
-//                     }
-//
-//                     currentRoom = room;
-//                     currentRoom.StreamList.TryAdd(context.Peer, responseStream);
-//                     
-//                     currentClient.JoinedRoom = currentRoom.Name;
-//                     room.Enter(context.Peer, currentClient);
-//
-//                     Console.WriteLine($"i found! Client : {context.Peer}");
-//
-//
-//                     await responseStream.WriteAsync(
-//                         new RoomResponse
-//                         {
-//                             Enter = new EnterResponse
-//                             {
-//                                 Success = new RoomInformation
-//                                 {
-//                                     Name = room.Name
-//                                 }
-//                             }
-//                         }
-//                     );
-//
-//                     break;
-//
-//                 case RoomRequest.RequestOneofCase.None:
-//                 default:
-//                     throw new InvalidOperationException();
-//             }
-//         }
-//         // When client quit.
-//
-//         currentRoom?.Exit(currentClient);
-//     }
