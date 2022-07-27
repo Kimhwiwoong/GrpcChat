@@ -32,7 +32,7 @@ public class ServerService
         return nickname;
     }
     
-    public bool ChangeNick(string newName, string oldName)
+    public bool ChangeNick(string newName, string peer)
     {
         if (NicknameAlready(newName))
         {
@@ -40,7 +40,7 @@ public class ServerService
             return false;
         }
         // Success -> change nickname and return true
-        var target = _clientList.Values.First(client => client.Name.Equals(oldName));
+        var target = _clientList.Values.First(client => client.Peer.Equals(peer));
         target.Name = newName;
         
         return true;

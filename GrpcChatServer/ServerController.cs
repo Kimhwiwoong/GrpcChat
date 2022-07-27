@@ -26,7 +26,7 @@ public class ServerController: ChatGrpc.ChatGrpcBase
     public override Task<SuccessFailResponse> ChangeNick(ChangeNickRequest request, ServerCallContext context)
     {
         var reply = new SuccessFailResponse();
-        if (!_serverService.ChangeNick(request.NewName, request.OldName))
+        if (!_serverService.ChangeNick(request.NewName, context.Peer))//, request.OldName
         {
             reply.Failed = new FailedResponse
             {
@@ -36,7 +36,7 @@ public class ServerController: ChatGrpc.ChatGrpcBase
         }
 
         reply.Success = new Empty();
-        var infoMsg = $"User \"{request.OldName}\" changed nickname to \"{request.NewName}\"";
+        var infoMsg = $"Peer\"{context.Peer}\" changed nickname to \"{request.NewName}\"";
         Console.WriteLine(infoMsg);
 
         return Task.FromResult(reply);

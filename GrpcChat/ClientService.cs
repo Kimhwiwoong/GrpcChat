@@ -56,7 +56,7 @@ public class ClientService
     {
         var request = new ChangeNickRequest()
         {
-            OldName = _userNickname,
+            // OldName = _userNickname,
             NewName = newName
         };
 

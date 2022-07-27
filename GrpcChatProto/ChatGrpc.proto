@@ -1,6 +1,17 @@
 syntax = "proto3";
 import "google/protobuf/empty.proto";
 
+
+service ChatGrpc {
+  rpc Enroll (google.protobuf.Empty) returns (EnrollResponse);
+  rpc ChangeNick (ChangeNickRequest) returns (SuccessFailResponse);
+  rpc CreateRoom (CreateRoomRequest) returns (SuccessFailResponse);
+  rpc ShowRooms (google.protobuf.Empty) returns (ShowRoomsResponse);
+  rpc EnterRoom (stream ChatRoomRequest) returns (stream ChatRoomResponse);
+}
+
+
+
 // Enroll
 message EnrollResponse{
   string nickname = 1;
@@ -8,7 +19,6 @@ message EnrollResponse{
 
 // ChangeNickname
 message ChangeNickRequest{
-  string old_name = 1;
   string new_name = 2;
 }
 
@@ -58,13 +68,3 @@ message ChatMessage {
 message FailedResponse {
   string reason = 1;
 }
-
-service ChatGrpc {
-  rpc Enroll (google.protobuf.Empty) returns (EnrollResponse);
-  rpc ChangeNick (ChangeNickRequest) returns (SuccessFailResponse);
-  rpc CreateRoom (CreateRoomRequest) returns (SuccessFailResponse);
-  rpc ShowRooms (google.protobuf.Empty) returns (ShowRoomsResponse);
-  rpc EnterRoom (stream ChatRoomRequest) returns (stream ChatRoomResponse);
-}
-
-
