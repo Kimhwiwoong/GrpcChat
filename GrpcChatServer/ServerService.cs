@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using Grpc.Core;
 
 namespace GrpcChatServer;
 
@@ -7,11 +6,10 @@ public class ServerService
 {
     private readonly ConcurrentDictionary<string, Client> _clientList = new();
     private readonly ConcurrentDictionary<string, ChatRoom> _chatRoomList = new();
-    public event Action? ChatEvent;
 
     private bool NicknameAlready(string target)
     {
-        return _clientList.Any(sameName => sameName.Key.Equals(target));
+        return _clientList.Values.Any(sameName => sameName.Name.Equals(target));
     }
     
     private bool RoomNameAlready(string target)
@@ -83,11 +81,6 @@ public class ServerService
         Console.WriteLine($"Client {currentClient.Name} entered room {room.Name}.");
     }
 
-    public void BroadCast()
-    {
-        ChatEvent?.Invoke();
-    }
-
     public Client GetCurrentClient(string peer)
     {
         return _clientList.Values.First(client => client.Peer.Equals(peer));
@@ -97,11 +90,4 @@ public class ServerService
     {
         return _chatRoomList.Values.FirstOrDefault(room => room.Name.Equals(name));
     }
-
-    // public static IEnumerable<IServerStreamWriter<RoomResponse>> GetOtherClients(ChatRoom room, string peer)
-    // {
-    //     var writerList = room.StreamList.Where(writers => writers.Key != peer)
-    //         .Select(writer => writer.Value);
-    //     return writerList;
-    // }
 }

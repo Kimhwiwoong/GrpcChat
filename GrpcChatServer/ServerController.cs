@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
@@ -6,13 +5,17 @@ namespace GrpcChatServer;
 
 public class ServerController: ChatGrpc.ChatGrpcBase
 {
-    private readonly ServerService _serverService = new();
-    private readonly ConcurrentDictionary<string, List<IServerStreamWriter<RoomResponse>>> _streamList = new();
+    private readonly ServerService _serverService;
 
-    public override Task<EnrollClient> Enroll(Empty request, ServerCallContext context)
+    public ServerController(ServerService serverService)
+    {
+        _serverService = serverService;
+    }
+    
+    public override Task<EnrollResponse> Enroll(Empty request, ServerCallContext context)
     {
         var nickname = _serverService.Enroll(context.Peer);
-        var reply = new EnrollClient
+        var reply = new EnrollResponse()
         {
             Nickname = nickname
         };
@@ -20,9 +23,9 @@ public class ServerController: ChatGrpc.ChatGrpcBase
         return Task.FromResult(reply);
     }
 
-    public override Task<ChangeNickResponse> ChangeNick(Nickname request, ServerCallContext context)
+    public override Task<SuccessFailResponse> ChangeNick(ChangeNickRequest request, ServerCallContext context)
     {
-        var reply = new ChangeNickResponse();
+        var reply = new SuccessFailResponse();
         if (!_serverService.ChangeNick(request.NewName, request.OldName))
         {
             reply.Failed = new FailedResponse
@@ -32,16 +35,16 @@ public class ServerController: ChatGrpc.ChatGrpcBase
             return Task.FromResult(reply);
         }
 
-        reply.Success = request;
+        reply.Success = new Empty();
         var infoMsg = $"User \"{request.OldName}\" changed nickname to \"{request.NewName}\"";
         Console.WriteLine(infoMsg);
 
         return Task.FromResult(reply);
     }
 
-    public override Task<CreateResponse> CreateRoom(RoomInformation request, ServerCallContext context)
+    public override Task<SuccessFailResponse> CreateRoom(CreateRoomRequest request, ServerCallContext context)
     {
-        var reply = new CreateResponse();
+        var reply = new SuccessFailResponse();
         
         if (!_serverService.CreateRoom(request.Name))
         {
@@ -52,16 +55,14 @@ public class ServerController: ChatGrpc.ChatGrpcBase
             return Task.FromResult(reply);
         }
         
-        _streamList.TryAdd(request.Name, new List<IServerStreamWriter<RoomResponse>>());
-        
         reply.Success = new Empty();
 
         return Task.FromResult(reply);
     }
 
-    public override Task<Rooms> ShowRooms(Empty request, ServerCallContext context)
+    public override Task<ShowRoomsResponse> ShowRooms(Empty request, ServerCallContext context)
     {
-        var reply = new Rooms()
+        var reply = new ShowRoomsResponse()
         {
             Names = { _serverService.ShowRooms() }
         };
@@ -69,8 +70,8 @@ public class ServerController: ChatGrpc.ChatGrpcBase
         return Task.FromResult(reply);
     }
 
-    public override async Task EnterRoom(IAsyncStreamReader<RoomRequest> requestStream,
-        IServerStreamWriter<RoomResponse> responseStream, ServerCallContext context)
+    public override async Task EnterRoom(IAsyncStreamReader<ChatRoomRequest> requestStream,
+        IServerStreamWriter<ChatRoomResponse> responseStream, ServerCallContext context)
     {
         var currentClient = _serverService.GetCurrentClient(context.Peer);
         currentClient.OnSend += OnCurrentClientOnOnSend;
@@ -82,7 +83,7 @@ public class ServerController: ChatGrpc.ChatGrpcBase
             return;
         }
         
-        if (requestStream.Current.RequestCase is not RoomRequest.RequestOneofCase.Enter)
+        if (requestStream.Current.RequestCase is not ChatRoomRequest.RequestOneofCase.Enter)
         {
             Console.WriteLine("WARNING: Need EnterRequest.");
             return;
@@ -97,18 +98,18 @@ public class ServerController: ChatGrpc.ChatGrpcBase
             return;
         }
 
-        _serverService.JoinClientToRoom(currentRoom!, context.Peer);
+        _serverService.JoinClientToRoom(currentRoom, context.Peer);
 
-        EnteredResponseSender(currentRoom!, responseStream);
+        EnteredResponseSender(responseStream);
 
         // Case of only ChatRequest type.
         while (await requestStream.MoveNext())
         {
-            if (requestStream.Current.RequestCase != RoomRequest.RequestOneofCase.Chat)
+            if (requestStream.Current.RequestCase != ChatRoomRequest.RequestOneofCase.Chat)
             {
                 Console.WriteLine("WARNING: Need ChatRequest.");
                 
-                var failedResponse = new RoomResponse
+                var failedResponse = new ChatRoomResponse
                 {
                     Failed = new FailedResponse
                     {
@@ -122,21 +123,21 @@ public class ServerController: ChatGrpc.ChatGrpcBase
             
             var chatMessage = 
                 $"[{DateTime.Now:yyyy-MM-dd hh:mm:ss tt}] " +
-                $"{currentRoom!.GetCurrentClientName(context.Peer)} : " +
+                $"{currentRoom.GetCurrentClientName(context.Peer)} : " +
                 $"{requestStream.Current.Chat.Message}";
             currentRoom.Broadcast(context.Peer, chatMessage);
         }
         
         // When client quit.
         currentClient.OnSend -= OnCurrentClientOnOnSend;
-        currentRoom?.Exit(context.Peer);
+        currentRoom.Exit(context.Peer);
         
         void OnCurrentClientOnOnSend(string s) => responseStream.WriteAsync(GetChatResponse(s)).Wait();
     }
 
-    private RoomResponse GetChatResponse(string msg)
+    private ChatRoomResponse GetChatResponse(string msg)
     {
-        var reply = new RoomResponse
+        var reply = new ChatRoomResponse
         {
             Chat = new ChatMessage
             {
@@ -146,29 +147,26 @@ public class ServerController: ChatGrpc.ChatGrpcBase
         return reply;
     }
 
-    private static async void NoRoomResponseSender(IAsyncStreamWriter<RoomResponse> responseStream)
+    private static async void NoRoomResponseSender(IAsyncStreamWriter<ChatRoomResponse> responseStream)
     {
         await responseStream.WriteAsync(
-            new RoomResponse
+            new ChatRoomResponse
             {
-                Enter = new EnterResponse
+                Enter = new SuccessFailResponse
                 {
                     Failed = new FailedResponse { Reason = "not Found" }
                 }
             });
     }
 
-    private static async void EnteredResponseSender(ChatRoom room, IAsyncStreamWriter<RoomResponse> responseStream)
+    private static async void EnteredResponseSender(IAsyncStreamWriter<ChatRoomResponse> responseStream)
     {
         await responseStream.WriteAsync(
-            new RoomResponse
+            new ChatRoomResponse
             {
-                Enter = new EnterResponse
+                Enter = new SuccessFailResponse
                 {
-                    Success = new RoomInformation
-                    {
-                        Name = room.Name
-                    }
+                    Success = new Empty()
                 }
             }
         );

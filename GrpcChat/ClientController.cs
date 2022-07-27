@@ -52,6 +52,7 @@ public class ClientController
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
+                break;
             }
         }
     }
@@ -86,7 +87,7 @@ public class ClientController
                 if (roomName == "/quit")
                     break;
 
-                _clientService.CreateRoom(roomName!);
+                _clientService.CreateRoom(roomName);
                 Console.WriteLine("Room Created.");
                 return;
             }
@@ -113,8 +114,9 @@ public class ClientController
                 if (newNickname == "/quit")
                     break;
                 
-                _clientService.ChangeNickname(newNickname!);
+                _clientService.ChangeNickname(newNickname);
                 Console.WriteLine($"Your new Nickname : {newNickname}");
+                break;
             }
             catch (Exception e)
             {
@@ -141,7 +143,7 @@ public class ClientController
 
         try
         {
-            var room = _clientService.EnterRoom(roomName);
+            var room = _clientService.EnterRoom(roomName!);
             room.OnMessage += (message) =>
             {
                 Console.WriteLine(message);
@@ -155,7 +157,7 @@ public class ClientController
                 if (line == "quit")
                     break;
                 
-                room.SendMessage(line);
+                room.SendMessage(line!);
             }
             
             room.Exit();

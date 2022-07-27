@@ -1,82 +1,70 @@
 syntax = "proto3";
 import "google/protobuf/empty.proto";
 
-message EnrollClient{
+// Enroll
+message EnrollResponse{
   string nickname = 1;
 }
 
-message ChangeNickResponse{
+// ChangeNickname
+message ChangeNickRequest{
+  string old_name = 1;
+  string new_name = 2;
+}
+
+// ShowRooms
+message ShowRoomsResponse {
+  repeated string names = 1;
+}
+
+// CreateRoom
+message CreateRoomRequest {
+  string name = 1;
+}
+
+// EnterRoom
+message EnterRoomRequest {
+  string room_name = 1;
+}
+
+// ChatRoom
+message ChatRoomRequest {
+  oneof request {
+    EnterRoomRequest enter = 1;
+    ChatMessage chat = 2;
+  }
+}
+
+message ChatRoomResponse {
   oneof response {
-    Nickname success = 1;
+    SuccessFailResponse enter = 1;
+    ChatMessage chat = 2;
+    FailedResponse failed = 3;
+  }
+}
+
+// Common
+message SuccessFailResponse {
+  oneof response {
+    google.protobuf.Empty success = 1;
     FailedResponse failed = 2;
   }
 }
 
 message ChatMessage {
-  string message = 1; 
-  string room_name = 2;
-}
-
-message Nickname {
-  string old_name = 1;
-  string new_name = 2;
-}
-message Rooms {
-  repeated string names = 1;
-}
-
-message RoomToEnter {
-  string name = 1;
-}
-
-message RoomInformation {
-  string name = 1;
-}
-
-message EnterRequest {
-  string room_name = 1;
+  string message = 1;
 }
 
 message FailedResponse {
   string reason = 1;
 }
 
-message CreateResponse {
-  oneof response{
-    google.protobuf.Empty success = 1;
-    FailedResponse failed = 2;
-  }
-}
-
-message EnterResponse {
-  oneof response {
-    RoomInformation success = 1;
-    FailedResponse failed = 2;
-  }
-}
-
-message RoomRequest {
-  oneof request {
-    EnterRequest enter = 1;
-    ChatMessage chat = 2;
-  }
-}
-
-message RoomResponse {
-  oneof response {
-    EnterResponse enter = 1;
-    ChatMessage chat = 2;
-    FailedResponse failed = 3;
-  }
-}
-
 service ChatGrpc {
-  rpc Enroll (google.protobuf.Empty) returns (EnrollClient);
-  rpc ChangeNick (Nickname) returns (ChangeNickResponse);
-  rpc CreateRoom (RoomInformation) returns (CreateResponse);
-  rpc ShowRooms (google.protobuf.Empty) returns (Rooms);
-  rpc EnterRoom (stream RoomRequest) returns (stream RoomResponse);
-  //rpc Chat (stream ChatMessage) returns (stream ChatMessage);
+  rpc Enroll (google.protobuf.Empty) returns (EnrollResponse);
+  rpc ChangeNick (ChangeNickRequest) returns (SuccessFailResponse);
+  rpc CreateRoom (CreateRoomRequest) returns (SuccessFailResponse);
+  rpc ShowRooms (google.protobuf.Empty) returns (ShowRoomsResponse);
+  rpc EnterRoom (stream ChatRoomRequest) returns (stream ChatRoomResponse);
 }
 
 

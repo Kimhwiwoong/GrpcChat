@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcChatServer", "GrpcChatS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecondGrpcChat", "SecondGrpcChat\SecondGrpcChat.csproj", "{27CDCFA7-8051-4829-BDFD-13359D5D9A53}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcChatTest", "GrpcChatTest\GrpcChatTest.csproj", "{B439F599-239F-4A12-A0D6-A3B4B6C3583A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{27CDCFA7-8051-4829-BDFD-13359D5D9A53}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27CDCFA7-8051-4829-BDFD-13359D5D9A53}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27CDCFA7-8051-4829-BDFD-13359D5D9A53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B439F599-239F-4A12-A0D6-A3B4B6C3583A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B439F599-239F-4A12-A0D6-A3B4B6C3583A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B439F599-239F-4A12-A0D6-A3B4B6C3583A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B439F599-239F-4A12-A0D6-A3B4B6C3583A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

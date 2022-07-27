@@ -29,7 +29,7 @@ public class ClientService
     // 방을 만든다.
     public void CreateRoom(string name)
     {
-        var request = new RoomInformation
+        var request = new CreateRoomRequest()
         {
             Name = name
         };
@@ -38,13 +38,13 @@ public class ClientService
         
         switch (reply.ResponseCase)
         {
-            case CreateResponse.ResponseOneofCase.Success:
+            case SuccessFailResponse.ResponseOneofCase.Success:
                 return;
             
-            case CreateResponse.ResponseOneofCase.Failed:
+            case SuccessFailResponse.ResponseOneofCase.Failed:
                 throw new Exception(reply.Failed.Reason);
             
-            case CreateResponse.ResponseOneofCase.None:
+            case SuccessFailResponse.ResponseOneofCase.None:
             default:
                 throw new InvalidOperationException("");
         }
@@ -54,7 +54,7 @@ public class ClientService
     // 닉네임을 바꾼다.
     public void ChangeNickname(string newName)
     {
-        var request = new Nickname
+        var request = new ChangeNickRequest()
         {
             OldName = _userNickname,
             NewName = newName
@@ -64,13 +64,14 @@ public class ClientService
         
         switch (reply.ResponseCase)
         {
-            case ChangeNickResponse.ResponseOneofCase.Success:
+            case SuccessFailResponse.ResponseOneofCase.Success:
+                _userNickname = newName;
                 return;
             
-            case ChangeNickResponse.ResponseOneofCase.Failed:
+            case SuccessFailResponse.ResponseOneofCase.Failed:
                 throw new Exception(reply.Failed.Reason);
             
-            case ChangeNickResponse.ResponseOneofCase.None:
+            case SuccessFailResponse.ResponseOneofCase.None:
             default:
                 throw new InvalidOperationException("");
         }
@@ -90,9 +91,9 @@ public class ClientService
     public Room EnterRoom(string roomName)
     {
         var call = _client.EnterRoom();
-        var request = new RoomRequest
+        var request = new ChatRoomRequest
         {
-            Enter = new EnterRequest
+            Enter = new EnterRoomRequest
             {
                 RoomName = roomName
             }
@@ -108,10 +109,10 @@ public class ClientService
 
         switch (enter.ResponseCase)
         {
-            case EnterResponse.ResponseOneofCase.Success:
+            case SuccessFailResponse.ResponseOneofCase.Success:
                 return new Room(call);
 
-            case EnterResponse.ResponseOneofCase.Failed:
+            case SuccessFailResponse.ResponseOneofCase.Failed:
                 throw new Exception(enter.Failed.Reason);
         }
 
@@ -128,14 +129,14 @@ public class ClientService
 
 public class Room
 {
-    private readonly AsyncDuplexStreamingCall<RoomRequest, RoomResponse> _call;
+    private readonly AsyncDuplexStreamingCall<ChatRoomRequest, ChatRoomResponse> _call;
 
     // 뭔가 메세지가 왔다.
     public event Action<string>? OnMessage;
     
     private readonly Task _readingTask;
     
-    public Room(AsyncDuplexStreamingCall<RoomRequest, RoomResponse> call)
+    public Room(AsyncDuplexStreamingCall<ChatRoomRequest, ChatRoomResponse> call)
     {
         _call = call;
         _readingTask = ReadAsync();
@@ -145,7 +146,7 @@ public class Room
     {
         while (await _call.ResponseStream.MoveNext())
         {
-            if (_call.ResponseStream.Current.ResponseCase is not RoomResponse.ResponseOneofCase.Failed)
+            if (_call.ResponseStream.Current.ResponseCase is not ChatRoomResponse.ResponseOneofCase.Failed)
             {
                 OnMessage?.Invoke(_call.ResponseStream.Current.Chat.Message);
                 continue;
@@ -157,12 +158,11 @@ public class Room
     // 메세지를 보낸다.
     public void SendMessage(string commands)
     {
-        var request = new RoomRequest
+        var request = new ChatRoomRequest
         {
             Chat = new ChatMessage
             {
-                Message = commands,
-                RoomName = ""
+                Message = commands
             }
         };
         
