@@ -60,16 +60,16 @@ public class ServerService
         return true;
     }
 
-    public IEnumerable<string> ShowRooms()
+    public Dictionary<string, int> ShowRooms()
     {
-        var names = _chatRoomList.Values.Select(room => $"{room.Name} ({room.ParticipantsCount()})");
-    
+        var roomList = _chatRoomList.Values.ToDictionary(room => room.Name, room => room.ParticipantsCount());
+
         // if (ChatRoomManger.TryCreateRoom("", out var room))
         // {
         //     room
         // }
         
-        return names;
+        return roomList;
     }
 
     public void JoinClientToRoom(ChatRoom room, string peer)

@@ -1,3 +1,4 @@
+using Google.Protobuf.Collections;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
@@ -62,9 +63,21 @@ public class ServerController: ChatGrpc.ChatGrpcBase
 
     public override Task<ShowRoomsResponse> ShowRooms(Empty request, ServerCallContext context)
     {
+        var rooms = _serverService.ShowRooms();
+        var infoList = new RepeatedField<RoomResponseInformation>();
+        
+        foreach (var room in rooms)
+        {
+            infoList.Add(new RoomResponseInformation
+            {
+                Name = room.Key,
+                ParticipantsCount = room.Value
+            });
+        }
+
         var reply = new ShowRoomsResponse()
         {
-            Names = { _serverService.ShowRooms() }
+            Rooms = { infoList }
         };
 
         return Task.FromResult(reply);

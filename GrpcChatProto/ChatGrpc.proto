@@ -24,7 +24,7 @@ message ChangeNickRequest{
 
 // ShowRooms
 message ShowRoomsResponse {
-  repeated string names = 1;
+  repeated RoomResponseInformation rooms = 1;
 }
 
 // CreateRoom
@@ -69,6 +69,11 @@ message SuccessFailResponse {
     google.protobuf.Empty success = 1;
     FailedResponse failed = 2;
   }
+}
+
+message RoomResponseInformation{
+  string name = 1;
+  int64 participants_count = 2;
 }
 
 message FailedResponse {

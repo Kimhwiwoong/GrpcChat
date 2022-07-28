@@ -75,7 +75,7 @@ public class ServerTest
     public async Task TestShowRooms()
     {
         var response = await _client.ShowRoomsAsync(new Empty());
-        if (response.Names is null)
+        if (response.Rooms is null)
         {
             Assert.Fail();
         }
@@ -85,12 +85,12 @@ public class ServerTest
     [Test]
     public async Task TestCreateRoom()
     {
-        var roomCount = _client.ShowRooms(new Empty()).Names.Count;
+        var roomCount = _client.ShowRooms(new Empty()).Rooms.Count;
         var response = await _client.CreateRoomAsync(new CreateRoomRequest
         {
             Name = "testRoom"
         });
-        var changedCount = _client.ShowRooms(new Empty()).Names.Count;
+        var changedCount = _client.ShowRooms(new Empty()).Rooms.Count;
         
         Assert.AreEqual(roomCount + 1, changedCount);
         

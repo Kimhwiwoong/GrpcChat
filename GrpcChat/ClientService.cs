@@ -83,7 +83,9 @@ public class ClientService
         var request = new Empty();
         var reply = _client.ShowRooms(request);
 
-        return reply.Names;
+        return reply.Rooms.Select(roomInfo 
+            => $"{roomInfo.Name} ({roomInfo.ParticipantsCount})"
+        ).ToList();
     }
 
     // 방에 들어간다.

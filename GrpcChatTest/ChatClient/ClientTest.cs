@@ -52,7 +52,7 @@ public class ClientTest
     }
     
     [Test]
-    public async Task TestCreateRoom()
+    public async Task TestCreateRoomAdded()
     {
         const string testRoomName = "testCreate";
         var request = new CreateRoomRequest
@@ -60,13 +60,28 @@ public class ClientTest
             Name = testRoomName
         };
 
-        var result = await _client.CreateRoomAsync(request);
-        var showResult = _client.ShowRooms(new Empty()).Names;
+        await _client.CreateRoomAsync(request);
         
-        if (showResult.All(name => name != testRoomName))
+        var showResult = _client.ShowRooms(new Empty());
+        if (showResult.Rooms.All(info => info.Name != testRoomName))
         {
+            Console.WriteLine("hi");
             Assert.Fail();
+            return;
         }
+
+        Assert.Pass();
+    }
+
+    [Test]
+    public async Task TestCreateRoomReceiveSuccess()
+    {
+        var request = new CreateRoomRequest
+        {
+            Name = "testsuite"
+        };
+
+        var result = await _client.CreateRoomAsync(request);
         
         if (result.ResponseCase is SuccessFailResponse.ResponseOneofCase.Failed)
         {
