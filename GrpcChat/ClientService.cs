@@ -52,12 +52,11 @@ public class ClientService
     }
     
     // 닉네임을 바꾼다.
-    public void ChangeNickname(string newName)
+    public void ChangeNickname(string newNickname)
     {
         var request = new ChangeNickRequest()
         {
-            // OldName = _userNickname,
-            NewName = newName
+            NewNickname = newNickname
         };
 
         var reply = _client.ChangeNick(request);
@@ -65,7 +64,7 @@ public class ClientService
         switch (reply.ResponseCase)
         {
             case SuccessFailResponse.ResponseOneofCase.Success:
-                _userNickname = newName;
+                _userNickname = newNickname;
                 return;
             
             case SuccessFailResponse.ResponseOneofCase.Failed:
@@ -160,7 +159,7 @@ public class Room
     {
         var request = new ChatRoomRequest
         {
-            Chat = new ChatMessage
+            Chat = new ChatMessageRequest()
             {
                 Message = commands
             }

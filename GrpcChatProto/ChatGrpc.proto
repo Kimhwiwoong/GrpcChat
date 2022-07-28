@@ -19,7 +19,7 @@ message EnrollResponse{
 
 // ChangeNickname
 message ChangeNickRequest{
-  string new_name = 2;
+  string new_nickname = 2;
 }
 
 // ShowRooms
@@ -41,17 +41,27 @@ message EnterRoomRequest {
 message ChatRoomRequest {
   oneof request {
     EnterRoomRequest enter = 1;
-    ChatMessage chat = 2;
+    ChatMessageRequest chat = 2;
   }
 }
 
 message ChatRoomResponse {
   oneof response {
     SuccessFailResponse enter = 1;
-    ChatMessage chat = 2;
+    ChatMessageResponse chat = 2;
     FailedResponse failed = 3;
   }
 }
+
+// ChatMessage
+message ChatMessageRequest {
+  string message = 1;
+}
+
+message ChatMessageResponse {
+  string message = 1;
+}
+
 
 // Common
 message SuccessFailResponse {
@@ -59,10 +69,6 @@ message SuccessFailResponse {
     google.protobuf.Empty success = 1;
     FailedResponse failed = 2;
   }
-}
-
-message ChatMessage {
-  string message = 1;
 }
 
 message FailedResponse {

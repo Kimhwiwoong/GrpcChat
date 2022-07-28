@@ -1,11 +1,9 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Grpc.Core;
+﻿using Grpc.Core;
 
 namespace GrpcChat
 {
     class GrpcChat
     {
-        private static string _userNickname = $"user{new Random().Next(1, int.MaxValue)}";
         private readonly ChatGrpc.ChatGrpcClient _client;   
         public static void Main()
         {
