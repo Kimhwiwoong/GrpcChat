@@ -64,11 +64,11 @@ public class ServerController: ChatGrpc.ChatGrpcBase
     public override Task<ShowRoomsResponse> ShowRooms(Empty request, ServerCallContext context)
     {
         var rooms = _serverService.ShowRooms();
-        var infoList = new RepeatedField<RoomResponseInformation>();
+        var infoList = new RepeatedField<RoomInformationResponse>();
         
         foreach (var room in rooms)
         {
-            infoList.Add(new RoomResponseInformation
+            infoList.Add(new RoomInformationResponse
             {
                 Name = room.Key,
                 ParticipantsCount = room.Value
@@ -77,7 +77,7 @@ public class ServerController: ChatGrpc.ChatGrpcBase
 
         var reply = new ShowRoomsResponse()
         {
-            Rooms = { infoList }
+            RoomInfos = { infoList }
         };
 
         return Task.FromResult(reply);
@@ -116,8 +116,25 @@ public class ServerController: ChatGrpc.ChatGrpcBase
         EnteredResponseSender(responseStream);
 
         // Case of only ChatRequest type.
-        while (await requestStream.MoveNext())
+        while (true)
         {
+            try
+            {
+                Console.WriteLine(context.Peer);
+                
+                var result = await requestStream.MoveNext();
+                if (!result)
+                    break;
+            }
+            catch (AggregateException ae) when (ae.InnerExceptions.Count == 1)
+            {
+                Console.WriteLine(ae.Flatten().InnerExceptions[0]);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
             if (requestStream.Current.RequestCase != ChatRoomRequest.RequestOneofCase.Chat)
             {
                 Console.WriteLine("WARNING: Need ChatRequest.");

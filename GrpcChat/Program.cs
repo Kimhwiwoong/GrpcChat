@@ -4,7 +4,7 @@ namespace GrpcChat
 {
     class GrpcChat
     {
-        private readonly ChatGrpc.ChatGrpcClient _client;   
+        //private readonly ChatGrpc.ChatGrpcClient _client;   
         public static void Main()
         {
             var channel = new Channel("127.0.0.1:12345", ChannelCredentials.Insecure);

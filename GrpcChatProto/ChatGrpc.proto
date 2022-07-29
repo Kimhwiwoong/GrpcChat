@@ -24,7 +24,7 @@ message ChangeNickRequest{
 
 // ShowRooms
 message ShowRoomsResponse {
-  repeated RoomResponseInformation rooms = 1;
+  repeated RoomInformationResponse room_infos = 1;
 }
 
 // CreateRoom
@@ -71,7 +71,7 @@ message SuccessFailResponse {
   }
 }
 
-message RoomResponseInformation{
+message RoomInformationResponse{
   string name = 1;
   int64 participants_count = 2;
 }

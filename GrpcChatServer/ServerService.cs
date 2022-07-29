@@ -62,7 +62,8 @@ public class ServerService
 
     public Dictionary<string, int> ShowRooms()
     {
-        var roomList = _chatRoomList.Values.ToDictionary(room => room.Name, room => room.ParticipantsCount());
+        var roomList = _chatRoomList.Values
+            .ToDictionary(room => room.Name, room => room.ParticipantsCount());
 
         // if (ChatRoomManger.TryCreateRoom("", out var room))
         // {

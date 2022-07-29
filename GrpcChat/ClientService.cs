@@ -83,7 +83,7 @@ public class ClientService
         var request = new Empty();
         var reply = _client.ShowRooms(request);
 
-        return reply.Rooms.Select(roomInfo 
+        return reply.RoomInfos.Select(roomInfo 
             => $"{roomInfo.Name} ({roomInfo.ParticipantsCount})"
         ).ToList();
     }
@@ -175,5 +175,7 @@ public class Room
     {
         _call.RequestStream.CompleteAsync().Wait();
         _readingTask.Wait();
+        
+        _call.Dispose();
     }
 }

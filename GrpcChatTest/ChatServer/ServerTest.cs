@@ -55,6 +55,8 @@ public class ServerTest
         // 애초에 그냥 return이나 뭐나 받아올수있는게 없는데??????
         // 코드 안바꾸고 테스트하는법 없나
         // 아니야 이건 아무리봐도 안되는것같아
+        
+        _client.Enroll(new Empty());
 
         var response = await _client.ChangeNickAsync(new ChangeNickRequest()
         {
@@ -75,7 +77,7 @@ public class ServerTest
     public async Task TestShowRooms()
     {
         var response = await _client.ShowRoomsAsync(new Empty());
-        if (response.Rooms is null)
+        if (response.RoomInfos is null)
         {
             Assert.Fail();
         }
@@ -85,12 +87,12 @@ public class ServerTest
     [Test]
     public async Task TestCreateRoom()
     {
-        var roomCount = _client.ShowRooms(new Empty()).Rooms.Count;
+        var roomCount = _client.ShowRooms(new Empty()).RoomInfos.Count;
         var response = await _client.CreateRoomAsync(new CreateRoomRequest
         {
             Name = "testRoom"
         });
-        var changedCount = _client.ShowRooms(new Empty()).Rooms.Count;
+        var changedCount = _client.ShowRooms(new Empty()).RoomInfos.Count;
         
         Assert.AreEqual(roomCount + 1, changedCount);
         

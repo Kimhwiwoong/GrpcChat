@@ -23,26 +23,25 @@ public class ServerServiceTest
         Assert.Pass();
     }
 
-    [TestCase("aaa")]
-    public void ChangeNickTest(string newName)
-    {
-        const string peer = "test";
-        _service.Enroll("test");
-        
-        var client = _service.GetCurrentClient(peer);
-        var oldName = client.Name;
-
-        _service.ChangeNick(newName, oldName);
-
-        Assert.AreEqual(newName, client.Name);
-    }
+    // [TestCase("aaa")]
+    // public void ChangeNickTest(string newName)
+    // {
+    //     const string peer = "test";
+    //     _service.Enroll("test");
+    //     
+    //     var client = _service.GetCurrentClient(peer);
+    //     var oldName = client.Name;
+    //
+    //     _service.ChangeNick(newName, oldName);
+    //
+    //     Assert.AreEqual(newName, client.Name);
+    // }
 
     [TestCase("testRoom")]
     public void CreateRoomTest(string roomName)
     {
         const string name = "test";
         var success = "yes";
-        
         _service.CreateRoom(name);
         
         if (_service.GetCurrentRoom(name) == null)
