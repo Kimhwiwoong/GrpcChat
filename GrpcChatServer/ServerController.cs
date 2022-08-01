@@ -120,8 +120,6 @@ public class ServerController: ChatGrpc.ChatGrpcBase
         {
             try
             {
-                Console.WriteLine(context.Peer);
-                
                 var result = await requestStream.MoveNext();
                 if (!result)
                     break;

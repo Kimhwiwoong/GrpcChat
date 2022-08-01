@@ -1,4 +1,6 @@
 using Grpc.Core;
+using GrpcChat;
+using GrpcChatServer;
 using NUnit.Framework;
 
 namespace GrpcChatTest;
@@ -42,5 +44,11 @@ public static class ChatClientTestUtility
             throw new Exception("Wrong response on EnterRequest");
 
         return call;
-    } 
+    }
+
+    public static void EnrollAndCreateRoom(string name, ClientService clientService)
+    {
+        clientService.Enroll();
+        clientService.CreateRoom(name);
+    }
 }

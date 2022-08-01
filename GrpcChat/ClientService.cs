@@ -6,7 +6,8 @@ namespace GrpcChat;
 public class ClientService
 {
     private readonly ChatGrpc.ChatGrpcClient _client;
-    private static string? _userNickname;
+    private string? _userNickname;
+    
     public ClientService(ChatGrpc.ChatGrpcClient client)
     {
         _client = client;
@@ -108,19 +109,14 @@ public class ClientService
         if (reply is not { Enter: { } enter })
             throw new InvalidOperationException();
 
-        switch (enter.ResponseCase)
+        return enter.ResponseCase switch
         {
-            case SuccessFailResponse.ResponseOneofCase.Success:
-                return new Room(call);
-
-            case SuccessFailResponse.ResponseOneofCase.Failed:
-                throw new Exception(enter.Failed.Reason);
-        }
-
-        throw new InvalidOperationException();
+            SuccessFailResponse.ResponseOneofCase.Success => new Room(call),
+            SuccessFailResponse.ResponseOneofCase.Failed => throw new EnterRoomException(enter.Failed.Reason),
+            _ => throw new InvalidOperationException()
+        };
     }
-    
-    
+
     // 닉네임을 반환한다.
     public string GetCurrentNickname()
     {
@@ -177,5 +173,13 @@ public class Room
         _readingTask.Wait();
         
         _call.Dispose();
+    }
+}
+
+// Another file..
+public class EnterRoomException : Exception
+{
+    public EnterRoomException(string reason) : base(reason)
+    {
     }
 }

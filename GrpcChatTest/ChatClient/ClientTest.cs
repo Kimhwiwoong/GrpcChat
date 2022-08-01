@@ -1,6 +1,6 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-using GrpcChatServer;
+using GrpcChat;
 using NUnit.Framework;
 
 namespace GrpcChatTest.ChatClient;
@@ -11,13 +11,11 @@ public class ClientTest
     private Channel _channel = null!;
     private Server _server = null!;
 
-
     [SetUp]
     public void Setup()
     {
         _server = TestUtility.CreateServer(12345);
         _server.Start();
-
         (_channel, _client) = TestUtility.CreateClient(12345);
     }
 
@@ -33,7 +31,7 @@ public class ClientTest
     {
         var request = new Empty();
         var response = _client.Enroll(request);
-        
+
         if (response.Nickname is null)
         {
             Assert.Fail();
@@ -103,7 +101,4 @@ public class ClientTest
         
         Assert.AreEqual(response.RoomInfos.Count + createCount, secondResponse.RoomInfos.Count);
     }
-
-    
-    
 }

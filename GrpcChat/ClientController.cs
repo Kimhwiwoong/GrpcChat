@@ -56,7 +56,7 @@ public class ClientController
             }
         }
     }
-    
+
     private void Enroll()
     {
         _clientService.Enroll();
@@ -80,22 +80,35 @@ public class ClientController
             {
                 Console.Write("Enter room name to create (or enter /quit to exit) : ");
                 var roomName = Console.ReadLine();
-                
-                if(string.IsNullOrWhiteSpace(roomName))
-                    continue;
 
-                if (roomName == "/quit")
+                if (!Validate(roomName!))
                     break;
 
-                _clientService.CreateRoom(roomName);
+                _clientService.CreateRoom(roomName!);
                 Console.WriteLine("Room Created.");
                 return;
+            }
+            catch (InvalidNameException)
+            {
+                Console.WriteLine("Invalid name.");
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
         }
+    }
+
+    private static bool Validate(string name)
+    {
+        if(string.IsNullOrWhiteSpace(name))
+            throw new InvalidNameException();
+ 
+        return name != "/quit";
+    }
+
+    private class InvalidNameException : Exception
+    {
     }
     
     // 닉네임을 바꾼다.
