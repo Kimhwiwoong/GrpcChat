@@ -83,7 +83,6 @@ public class ClientTest
     [Test]
     public async Task TestShowRooms()
     {
-        // 개수 확인하는 방법보다 이름을 아니까 이름들어있는지 확인하는게 좋아보이는데
         const int createCount = 5;
         
         var request = new Empty();
@@ -100,5 +99,24 @@ public class ClientTest
         var secondResponse = await _client.ShowRoomsAsync(request);
         
         Assert.AreEqual(response.RoomInfos.Count + createCount, secondResponse.RoomInfos.Count);
+    }
+
+    
+    public async Task TestEnterRoom()
+    {
+        const string roomName = "room";
+        try
+        {
+            ChatClientTestUtility.Enroll(_client);
+            ChatClientTestUtility.CreateRoom(_client, roomName);
+            
+            var call = await ChatClientTestUtility.Enter(_client, "aa");
+        }
+        catch (Exception e)
+        {
+            Assert.Fail(e.Message);
+        }
+        
+        Assert.Pass();
     }
 }

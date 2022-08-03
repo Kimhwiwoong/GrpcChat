@@ -145,7 +145,8 @@ public class Room
         {
             if (_call.ResponseStream.Current.ResponseCase is not ChatRoomResponse.ResponseOneofCase.Failed)
             {
-                OnMessage?.Invoke(_call.ResponseStream.Current.Chat.Message);
+                var chatResponse = _call.ResponseStream.Current.Chat;
+                OnMessage?.Invoke($"[{chatResponse.Time}] {chatResponse.Nickname} : {chatResponse.Message}");
                 continue;
             }
             OnMessage?.Invoke(_call.ResponseStream.Current.Failed.Reason);

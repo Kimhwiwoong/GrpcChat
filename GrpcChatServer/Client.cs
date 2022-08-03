@@ -8,12 +8,12 @@ public class Client
         Name = name;
     }
 
-    public void Send(string chatMsg)
+    public void Send(MessageContext context)
     {
-        OnSend?.Invoke(chatMsg);
+        OnSend?.Invoke(context);
     }
 
     public string Peer { get; }
     public string Name { get; set; }
-    public event Action<string>? OnSend;
+    public event Action<MessageContext>? OnSend;
 }

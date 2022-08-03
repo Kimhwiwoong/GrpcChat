@@ -1,3 +1,4 @@
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using GrpcChat;
 using GrpcChatServer;
@@ -46,6 +47,26 @@ public static class ChatClientTestUtility
         return call;
     }
 
+    public static async void CreateRoom(ChatGrpc.ChatGrpcClient client, string roomName)
+    {
+        var request = new CreateRoomRequest
+        {
+            Name = roomName
+        };
+
+        await client.CreateRoomAsync(request);
+    }
+
+    public static void Enroll(ChatGrpc.ChatGrpcClient client)
+    {
+        var request = new Empty();
+        client.Enroll(request);
+    }
+
+    
+    
+    
+    // 얘는 clientService용인데??
     public static void EnrollAndCreateRoom(string name, ClientService clientService)
     {
         clientService.Enroll();

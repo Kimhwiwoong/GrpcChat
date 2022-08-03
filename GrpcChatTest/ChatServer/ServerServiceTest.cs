@@ -18,7 +18,7 @@ public class ServerServiceTest
     public void EnrollTest(string peer)
     {
         _service.Enroll(peer);
-        _service.GetCurrentClient(peer);
+        _service.FindClient(peer);
         
         Assert.Pass();
     }
@@ -42,9 +42,9 @@ public class ServerServiceTest
     {
         const string name = "test";
         var success = "yes";
-        _service.CreateRoom(name);
+        _service.TryCreateRoom(name);
         
-        if (_service.GetCurrentRoom(name) == null)
+        if (_service.FindRoom(name) == null)
         {
             success = "no";
         }

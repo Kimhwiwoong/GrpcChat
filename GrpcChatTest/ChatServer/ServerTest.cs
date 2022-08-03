@@ -50,12 +50,6 @@ public class ServerTest
     [Test]
     public async Task TestChangeNick()
     {
-        // var enrollResponse = await _client.EnrollAsync(new Empty());
-        // var oldNickname = enrollResponse.Nickname;
-        // 애초에 그냥 return이나 뭐나 받아올수있는게 없는데??????
-        // 코드 안바꾸고 테스트하는법 없나
-        // 아니야 이건 아무리봐도 안되는것같아
-        
         _client.Enroll(new Empty());
 
         var response = await _client.ChangeNickAsync(new ChangeNickRequest()

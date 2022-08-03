@@ -1,63 +1,58 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
+using GrpcChatServer.Exceptions;
 
 namespace GrpcChatServer;
 
-public class ServerService 
+public class ServerService
 {
     private readonly ConcurrentDictionary<string, Client> _clientList = new();
     private readonly ConcurrentDictionary<string, ChatRoom> _chatRoomList = new();
 
-    private bool NicknameAlready(string target)
-    {
-        return _clientList.Values.Any(sameName => sameName.Name.Equals(target));
-    }
-    
-    private bool RoomNameAlready(string target)
-    {
-        return _chatRoomList.Any(sameName => sameName.Key.Equals(target));
-    }
-
     public string Enroll(string peer)
     {
-        // When nickname is unique, add client to list and return client's nickname 
-        var nickname = $"user{new Random().Next(1, int.MaxValue)}";
-        while (NicknameAlready(nickname))
+        // When nickname is unique, add client to list and return client's nickname
+        string nickname;
+        Client client;
+        do
         {
-            nickname = $"user{new Random().Next(1, int.MaxValue)}";
-        }
-        var client = new Client(peer, nickname);
+            nickname = GenerateNickname();
+            client = new Client(peer, nickname);
+        } while (!_clientList.TryAdd(nickname, client));
 
-        _clientList.TryAdd(nickname, client);
+        // var nickname = GenerateNickname();
+        // var client = new Client(peer, nickname);
+        //
+        // while (!_clientList.TryAdd(nickname, client))
+        // {
+        //     nickname = GenerateNickname();
+        //     client.Name = nickname;
+        // }
 
         return nickname;
     }
-    
-    public bool ChangeNick(string newName, string peer)
+
+    private static string GenerateNickname()
     {
-        if (NicknameAlready(newName))
-        {
-            // Fail -> return false
-            return false;
-        }
+        return $"user{new Random().Next(1, int.MaxValue)}";
+    }
+
+    public bool TryChangeNick(string newName, string peer)
+    {
         // Success -> change nickname and return true
-        var target = _clientList.Values.First(client => client.Peer.Equals(peer));
+        var target = _clientList.Values.FirstOrDefault(client => client.Peer.Equals(peer));
+        if (target is null)
+            return false;
+
         target.Name = newName;
-        
         return true;
     }
 
-    public bool CreateRoom(string name)
+    public bool TryCreateRoom(string name)
     {
-        if (RoomNameAlready(name))
-        {
-            // Fail -> return false
-            return false;
-        }
         // Success -> create room and return true
         var newRoom = new ChatRoom(name);
-        _chatRoomList.TryAdd(name, newRoom);
-        
-        return true;
+        return _chatRoomList.TryAdd(name, newRoom);
     }
 
     public Dictionary<string, int> ShowRooms()
@@ -65,30 +60,37 @@ public class ServerService
         var roomList = _chatRoomList.Values
             .ToDictionary(room => room.Name, room => room.ParticipantsCount());
 
-        // if (ChatRoomManger.TryCreateRoom("", out var room))
-        // {
-        //     room
-        // }
-        
         return roomList;
     }
 
-    public void JoinClientToRoom(ChatRoom room, string peer)
+    public void RemoveRoom(string name)
     {
-        var currentClient = _clientList.Values.First(client => client.Peer.Equals(peer));
-
-        room.Enter(peer, currentClient);
-        
-        Console.WriteLine($"Client {currentClient.Name} entered room {room.Name}.");
+        _chatRoomList.TryRemove(name, out _);
     }
 
-    public Client GetCurrentClient(string peer)
+    public Client FindClient(string peer)
     {
-        return _clientList.Values.First(client => client.Peer.Equals(peer));
+        if (!_clientList.TryGetValue(peer, out var client))
+            throw new ClientNotFoundException(peer);
+
+        return client;
+        // return _clientList.Values.First(client => client.Peer.Equals(peer));
     }
 
-    public ChatRoom? GetCurrentRoom(string name)
+    public ChatRoom FindRoom(string name)
     {
-        return _chatRoomList.Values.FirstOrDefault(room => room.Name.Equals(name));
+        if (!_chatRoomList.TryGetValue(name, out var room))
+            throw new RoomNotFoundException(name);
+
+        return room;
+        // var room = _chatRoomList.Values.FirstOrDefault(room => room.Name.Equals(name));
+    }
+
+    public bool TryFindRoom(string name, [MaybeNullWhen(false)] out ChatRoom room)
+    {
+        return _chatRoomList.TryGetValue(name, out room);
+        // room = _chatRoomList.Values.FirstOrDefault(room => room.Name.Equals(name));
+        //
+        // return room is not null;
     }
 }

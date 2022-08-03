@@ -42,15 +42,6 @@ public class ClientServiceTest
         Assert.AreNotEqual(null, _clientService.GetCurrentNickname());
     }
 
-    // 에러 테스트 코드 예시.
-    // public void TestEnroll_InvalidOperationError()
-    // {
-    //     _clientService.UserNickName = "root"; // 1. 에러가 나도록 환경을 조성
-    //
-    //     // 2. 에러를 의도적으로 발생시킨 후, 해당 에러가 정확히 나지 않으면 fail.
-    //     Assert.Catch<InvalidOperationException>(() => _clientService.Enroll());
-    // }
-
     [Test]
     public void TestCreateRoom()
     {
@@ -138,13 +129,36 @@ public class ClientServiceTest
         
         Assert.Pass();
     }
-
-    public void TestEnterRoom_EnterRoomException()
+    
+    [Test]
+    public void TestEnterRoomInvalid()
     {
-        // 에러를 내기 위한 사전 작업
+        const string roomName = "room";
+        _clientService.Enroll();
         
-        Assert.Catch<EnterRoomException>(() => _clientService.EnterRoom("room"));
+        // Assert.Catch<EnterRoomException>(() => _clientService.EnterRoom(roomName));
+        
+        try
+        {
+            var room = _clientService.EnterRoom(roomName);
+            room.Exit();
+        }
+        catch (EnterRoomException e)
+        {
+            Assert.Pass(e.Message);
+        }
+        
+        Assert.Fail();
     }
+    
+    // 에러 테스트 코드 예시.
+    // public void TestEnroll_InvalidOperationError()
+    // {
+    //     _clientService.UserNickName = "root"; // 1. 에러가 나도록 환경을 조성
+    //
+    //     // 2. 에러를 의도적으로 발생시킨 후, 해당 에러가 정확히 나지 않으면 fail.
+    //     Assert.Catch<InvalidOperationException>(() => _clientService.Enroll());
+    // }
 
     [Test]
     public void TestSendChat()

@@ -1,6 +1,6 @@
 syntax = "proto3";
 import "google/protobuf/empty.proto";
-
+import "google/protobuf/timestamp.proto";
 
 service ChatGrpc {
   rpc Enroll (google.protobuf.Empty) returns (EnrollResponse);
@@ -60,6 +60,8 @@ message ChatMessageRequest {
 
 message ChatMessageResponse {
   string message = 1;
+  google.protobuf.Timestamp time = 2;
+  string nickname = 3;
 }
 
 
