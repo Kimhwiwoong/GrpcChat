@@ -1,5 +1,6 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using GrpcChat.Exceptions;
 
 namespace GrpcChat;
 
@@ -13,7 +14,6 @@ public class ClientService
         _client = client;
     }
     
-    // 로그인한다.
     public void Enroll()
     {
         var request = new Empty();
@@ -27,7 +27,6 @@ public class ClientService
         _userNickname = reply.Nickname;
     }
     
-    // 방을 만든다.
     public void CreateRoom(string name)
     {
         var request = new CreateRoomRequest()
@@ -52,7 +51,6 @@ public class ClientService
         
     }
     
-    // 닉네임을 바꾼다.
     public void ChangeNickname(string newNickname)
     {
         var request = new ChangeNickRequest()
@@ -78,7 +76,6 @@ public class ClientService
 
     }
     
-    // 방 목록을 본다
     public IEnumerable<string> ShowRooms()
     {
         var request = new Empty();
@@ -89,7 +86,6 @@ public class ClientService
         ).ToList();
     }
 
-    // 방에 들어간다.
     public Room EnterRoom(string roomName)
     {
         var call = _client.EnterRoom();
@@ -117,7 +113,6 @@ public class ClientService
         };
     }
 
-    // 닉네임을 반환한다.
     public string GetCurrentNickname()
     {
         return _userNickname!;
@@ -128,7 +123,6 @@ public class Room
 {
     private readonly AsyncDuplexStreamingCall<ChatRoomRequest, ChatRoomResponse> _call;
 
-    // 뭔가 메세지가 왔다.
     public event Action<string>? OnMessage;
     
     private readonly Task _readingTask;
@@ -153,7 +147,6 @@ public class Room
         }
     }
 
-    // 메세지를 보낸다.
     public void SendMessage(string commands)
     {
         var request = new ChatRoomRequest
@@ -167,20 +160,11 @@ public class Room
         _call.RequestStream.WriteAsync(request).Wait();
     }
 
-    // 방에서 나간다.
     public void Exit()
     {
         _call.RequestStream.CompleteAsync().Wait();
         _readingTask.Wait();
         
         _call.Dispose();
-    }
-}
-
-// Another file..
-public class EnterRoomException : Exception
-{
-    public EnterRoomException(string reason) : base(reason)
-    {
     }
 }

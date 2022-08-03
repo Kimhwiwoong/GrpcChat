@@ -11,23 +11,14 @@ public class ServerService
 
     public string Enroll(string peer)
     {
-        // When nickname is unique, add client to list and return client's nickname
         string nickname;
         Client client;
+        
         do
         {
             nickname = GenerateNickname();
             client = new Client(peer, nickname);
-        } while (!_clientList.TryAdd(nickname, client));
-
-        // var nickname = GenerateNickname();
-        // var client = new Client(peer, nickname);
-        //
-        // while (!_clientList.TryAdd(nickname, client))
-        // {
-        //     nickname = GenerateNickname();
-        //     client.Name = nickname;
-        // }
+        } while (!_clientList.TryAdd(peer, client));
 
         return nickname;
     }
@@ -39,7 +30,6 @@ public class ServerService
 
     public bool TryChangeNick(string newName, string peer)
     {
-        // Success -> change nickname and return true
         var target = _clientList.Values.FirstOrDefault(client => client.Peer.Equals(peer));
         if (target is null)
             return false;
@@ -50,8 +40,10 @@ public class ServerService
 
     public bool TryCreateRoom(string name)
     {
-        // Success -> create room and return true
         var newRoom = new ChatRoom(name);
+        // 으악 순서꼬였다 생성자에 넣으면 안되네
+        newRoom.OnRemove += RemoveRoom;
+        
         return _chatRoomList.TryAdd(name, newRoom);
     }
 
@@ -66,16 +58,16 @@ public class ServerService
     public void RemoveRoom(string name)
     {
         _chatRoomList.TryRemove(name, out _);
+        Console.WriteLine($"Room {name} removed for no user.");
     }
 
     public Client FindClient(string peer)
     {
-        Console.WriteLine($"peer : {peer} findclient enter");
-        // if (!_clientList.TryGetValue(peer, out var client))
-        //     throw new ClientNotFoundException(peer);
-        // Console.WriteLine(client.Peer);
-        // return client;
-        return _clientList.Values.First(client => client.Peer.Equals(peer));
+        if (!_clientList.TryGetValue(peer, out var client))
+            throw new ClientNotFoundException(peer);
+        
+        return client;
+        //return _clientList.Values.First(client => client.Peer.Equals(peer));
     }
 
     public ChatRoom FindRoom(string name)
@@ -91,7 +83,6 @@ public class ServerService
     {
         return _chatRoomList.TryGetValue(name, out room);
         // room = _chatRoomList.Values.FirstOrDefault(room => room.Name.Equals(name));
-        //
         // return room is not null;
     }
 }

@@ -1,3 +1,5 @@
+using GrpcChat.Exceptions;
+
 namespace GrpcChat;
 
 public class ClientController
@@ -20,27 +22,22 @@ public class ClientController
                 switch (Console.ReadLine())
                 {
                     case "create_room" :
-                        // 방 생성
                         CreateRoom();
                         break;
                         
                     case "show_rooms" :
-                        // 방 목록
                         ShowRooms();
                         break;
                         
                     case "change_nickname" :
-                        // 닉변
                         ChangeNickname();
                         break;
                         
                     case "enter_room" : 
-                        // 방 입장
                         EnterRoom();
                         break;
                         
                     case "exit":
-                        // ㅌㅌ
                         Console.WriteLine("GoodBye");
                         continue;
 
@@ -71,7 +68,6 @@ public class ClientController
         Console.WriteLine($"Your Nickname : {_clientService.GetCurrentNickname()}");
     }
     
-    // 방을 만든다.
     private void CreateRoom()
     {
         while (true)
@@ -107,11 +103,6 @@ public class ClientController
         return name != "/quit";
     }
 
-    private class InvalidNameException : Exception
-    {
-    }
-    
-    // 닉네임을 바꾼다.
     private void ChangeNickname()
     {
         while (true)
@@ -138,7 +129,6 @@ public class ClientController
         }
     }
     
-    // 방 목록을 본다
     private void ShowRooms()
     {
         var roomsInfo = _clientService.ShowRooms();
@@ -148,7 +138,6 @@ public class ClientController
         }
     }
 
-    // 방에 들어간다.
     private void EnterRoom()
     {
         Console.WriteLine("room name to enter : ");

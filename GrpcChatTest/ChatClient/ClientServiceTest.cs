@@ -1,5 +1,6 @@
 using Grpc.Core;
 using GrpcChat;
+using GrpcChat.Exceptions;
 using NUnit.Framework;
 
 namespace GrpcChatTest.ChatClient;

@@ -58,6 +58,9 @@ public class ServerController : ChatGrpc.ChatGrpcBase
         }
 
         reply.Success = new Empty();
+        
+        //_serverService.CheckRemoveRoom(request.Name);
+        
         return Task.FromResult(reply);
     }
 
@@ -98,7 +101,7 @@ public class ServerController : ChatGrpc.ChatGrpcBase
                 throw new ServerException("WARNING: Need EnterRequest.");
 
             var roomName = requestStream.Current.Enter.RoomName;
-
+            
             var room = _serverService.FindRoom(roomName);
 
             using var enter = room.Enter(client, responseStream.SendMessage);
@@ -128,13 +131,5 @@ public class ServerController : ChatGrpc.ChatGrpcBase
         {
             responseStream.SendFail(e);
         }
-        // When client quit.
-
-        // When after client quit, need to count number of clients in Chatroom.
-        // If count == 0, re-check chatroom after some seconds.
-        // Still count == 0, remove that chatroom.
     }
-
-    // Adapting
-
 }
