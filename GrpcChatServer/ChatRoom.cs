@@ -6,18 +6,10 @@ public class ChatRoom
 {
     private const int QueueSize = 10;
     private readonly ConcurrentDictionary<string, Client> _clients = new();
-    private readonly ConcurrentQueue<string> _previousChats = new();
+    //private readonly ConcurrentQueue<string> _previousChats = new();
+    private readonly ConcurrentQueue<Tuple<string, string>> _previousChats = new();
     public string Name { get; }
     
-    public void Enter(string peer, Client client)
-    {
-        // lock (_participantsLock)
-        // {
-        //     ParticipantsCount++;    
-        // }
-        _clients.TryAdd(peer, client);
-        //Interlocked.Increment(ref _participantsCount);
-    }
 
     public EnterContext Enter(Client client, Action<MessageContext> action)
     {
@@ -54,7 +46,8 @@ public class ChatRoom
             _previousChats.TryDequeue(out _);
         }
         
-        _previousChats.Enqueue(message);
+        // _previousChats.Enqueue(message);
+        _previousChats.Enqueue(new Tuple<string, string>(peer, message));
         
         var context = new MessageContext(_clients[peer], DateTime.Now, message);
 
@@ -71,7 +64,8 @@ public class ChatRoom
         
         foreach (var chat in _previousChats)
         {
-            currentClient.Send(new MessageContext(_clients[peer], DateTime.Now, chat));
+            // currentClient.Send(new MessageContext(_clients[peer], DateTime.Now, chat));
+            currentClient.Send(new MessageContext(_clients[chat.Item1], DateTime.Now, chat.Item2));
         }
     }
 

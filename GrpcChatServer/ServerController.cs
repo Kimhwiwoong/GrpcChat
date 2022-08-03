@@ -58,7 +58,6 @@ public class ServerController : ChatGrpc.ChatGrpcBase
         }
 
         reply.Success = new Empty();
-
         return Task.FromResult(reply);
     }
 

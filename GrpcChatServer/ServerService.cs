@@ -70,11 +70,12 @@ public class ServerService
 
     public Client FindClient(string peer)
     {
-        if (!_clientList.TryGetValue(peer, out var client))
-            throw new ClientNotFoundException(peer);
-
-        return client;
-        // return _clientList.Values.First(client => client.Peer.Equals(peer));
+        Console.WriteLine($"peer : {peer} findclient enter");
+        // if (!_clientList.TryGetValue(peer, out var client))
+        //     throw new ClientNotFoundException(peer);
+        // Console.WriteLine(client.Peer);
+        // return client;
+        return _clientList.Values.First(client => client.Peer.Equals(peer));
     }
 
     public ChatRoom FindRoom(string name)

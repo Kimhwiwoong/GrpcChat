@@ -100,8 +100,8 @@ public class ClientService
                 RoomName = roomName
             }
         };
-        call.RequestStream.WriteAsync(request).Wait();
         
+        call.RequestStream.WriteAsync(request).Wait();
         if (!call.ResponseStream.MoveNext().Result)
             throw new InvalidOperationException();
 
