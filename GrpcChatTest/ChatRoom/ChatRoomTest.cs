@@ -7,7 +7,7 @@ namespace GrpcChatTest.ChatRoom;
 public class ChatRoomTest
 {
     private readonly ConcurrentDictionary<string, Client> _clients = new();
-    private readonly ConcurrentQueue<MessageContext> _previousChats = new();
+    private readonly ConcurrentQueue<MessageData> _previousChats = new();
     private GrpcChatServer.ChatRoom _room = null!;
     [SetUp]
     public void SetUp()

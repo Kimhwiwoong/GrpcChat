@@ -66,16 +66,14 @@ public class ServerController : ChatGrpc.ChatGrpcBase
 
     public override Task<ShowRoomsResponse> ShowRooms(Empty request, ServerCallContext context)
     {
-        var rooms = _serverService.ShowRooms();
-
         var infoList = new RepeatedField<RoomInformationResponse>();
 
-        foreach (var room in rooms)
+        foreach (var room in _serverService.ChatRooms.Values)
         {
             infoList.Add(new RoomInformationResponse
             {
-                Name = room.Key,
-                ParticipantsCount = room.Value
+                Name = room.Name,
+                ParticipantsCount = room.ParticipantsCount()
             });
         }
 
@@ -92,7 +90,8 @@ public class ServerController : ChatGrpc.ChatGrpcBase
     {
         try
         {
-            var client = _serverService.FindClient(context.Peer);
+            if (!_serverService.Clients.TryGetValue(context.Peer, out var client))
+                throw new ServerException("No such client exist.");
 
             if (!await requestStream.MoveNext())
                 throw new ServerException("WARNING: Unexpected End of Stream.");
@@ -102,7 +101,8 @@ public class ServerController : ChatGrpc.ChatGrpcBase
 
             var roomName = requestStream.Current.Enter.RoomName;
             
-            var room = _serverService.FindRoom(roomName);
+            if(!_serverService.ChatRooms.TryGetValue(roomName, out var room))
+                throw new ServerException("No such room exist.");
 
             using var enter = room.Enter(client, responseStream.SendMessage);
             responseStream.SendEnter();

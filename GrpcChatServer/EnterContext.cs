@@ -6,9 +6,9 @@ public class EnterContext : IDisposable
 
     private ChatRoom CurrentRoom { get; }
     
-    private readonly Action<MessageContext> _action;
+    private readonly Action<MessageData> _action;
 
-    public EnterContext(Client currentClient, ChatRoom currentRoom, Action<MessageContext> action)
+    public EnterContext(Client currentClient, ChatRoom currentRoom, Action<MessageData> action)
     {
         _action = action;
         CurrentClient = currentClient;
