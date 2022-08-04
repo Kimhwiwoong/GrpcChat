@@ -23,15 +23,9 @@ public class ServerService
         return nickname;
     }
 
-    private static string GenerateNickname()
-    {
-        return $"user{new Random().Next(1, int.MaxValue)}";
-    }
-
     public bool TryChangeNick(string newName, string peer)
     {
-        var target = _clientList.Values.FirstOrDefault(client => client.Peer.Equals(peer));
-        if (target is null)
+        if (!_clientList.TryGetValue(peer, out var target))
             return false;
 
         target.Name = newName;
@@ -41,8 +35,8 @@ public class ServerService
     public bool TryCreateRoom(string name)
     {
         var newRoom = new ChatRoom(name);
-        // 으악 순서꼬였다 생성자에 넣으면 안되네
-        newRoom.OnRemove += RemoveRoom;
+
+        newRoom.Handler.OnRemove += () => RemoveRoom(name);
         
         return _chatRoomList.TryAdd(name, newRoom);
     }
@@ -55,19 +49,12 @@ public class ServerService
         return roomList;
     }
 
-    public void RemoveRoom(string name)
-    {
-        _chatRoomList.TryRemove(name, out _);
-        Console.WriteLine($"Room {name} removed for no user.");
-    }
-
     public Client FindClient(string peer)
     {
         if (!_clientList.TryGetValue(peer, out var client))
             throw new ClientNotFoundException(peer);
         
         return client;
-        //return _clientList.Values.First(client => client.Peer.Equals(peer));
     }
 
     public ChatRoom FindRoom(string name)
@@ -76,13 +63,22 @@ public class ServerService
             throw new RoomNotFoundException(name);
 
         return room;
-        // var room = _chatRoomList.Values.FirstOrDefault(room => room.Name.Equals(name));
     }
 
     public bool TryFindRoom(string name, [MaybeNullWhen(false)] out ChatRoom room)
     {
         return _chatRoomList.TryGetValue(name, out room);
-        // room = _chatRoomList.Values.FirstOrDefault(room => room.Name.Equals(name));
-        // return room is not null;
+
+    }
+    
+    private void RemoveRoom(string name)
+    {
+        _chatRoomList.TryRemove(name, out _);
+        Console.WriteLine($"Room {name} removed for no user.");
+    }
+    
+    private static string GenerateNickname()
+    {
+        return $"user{new Random().Next(1, int.MaxValue)}";
     }
 }

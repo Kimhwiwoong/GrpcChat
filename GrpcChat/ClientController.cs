@@ -5,11 +5,6 @@ namespace GrpcChat;
 public class ClientController
 {
     private readonly ClientService _clientService;
-
-    public ClientController(ClientService clientService)
-    {
-        _clientService = clientService;
-    }
     
     public void Start()
     {
@@ -40,6 +35,11 @@ public class ClientController
                     case "exit":
                         Console.WriteLine("GoodBye");
                         continue;
+                    
+                    case "clear":
+                        Console.Clear();
+                        PrintCommands();
+                        continue;
 
                     default:
                         Console.WriteLine("Wrong command");
@@ -53,16 +53,29 @@ public class ClientController
             }
         }
     }
+    
+    public ClientController(ClientService clientService)
+    {
+        _clientService = clientService;
+    }
+
+    
 
     private void Enroll()
     {
         _clientService.Enroll();
-            
+        
+        PrintCommands();
+    }
+
+    private void PrintCommands()
+    {
         Console.WriteLine("______________________________________________");
-        Console.WriteLine("change_nickname   :   닉변                     ");
+        Console.WriteLine("change_nickname   :   닉네임 변경                ");
         Console.WriteLine("create_room       :   방 생성                   ");
         Console.WriteLine("show_rooms        :   방 목록 조회               ");
         Console.WriteLine("enter_room        :   방 입장                   ");
+        Console.WriteLine("clear             :   지우기                    ");
         Console.WriteLine("exit              :   종료                     ");
         Console.WriteLine("______________________________________________");
         Console.WriteLine($"Your Nickname : {_clientService.GetCurrentNickname()}");
@@ -146,6 +159,10 @@ public class ClientController
         try
         {
             var room = _clientService.EnterRoom(roomName!);
+            
+            Console.Clear();
+            Console.WriteLine($"_______________Entered {roomName}_______________");
+            
             room.OnMessage += (message) =>
             {
                 Console.WriteLine(message);
@@ -157,8 +174,12 @@ public class ClientController
                 
                 // Do not any message to server -> server can't know user quit chatting room.
                 if (line == "quit")
+                {
+                    Console.Clear();
+                    PrintCommands();
                     break;
-                
+                }
+
                 room.SendMessage(line!);
             }
             

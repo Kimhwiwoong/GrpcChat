@@ -189,7 +189,7 @@ public class ClientServiceTest
 
         try
         {
-            var room = _clientService.EnterRoom(roomName);
+           _clientService.EnterRoom(roomName);
             
         }
         catch (Exception e)

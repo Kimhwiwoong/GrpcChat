@@ -82,7 +82,7 @@ public class ServerTest
     public async Task TestCreateRoom()
     {
         var roomCount = _client.ShowRooms(new Empty()).RoomInfos.Count;
-        var response = await _client.CreateRoomAsync(new CreateRoomRequest
+        await _client.CreateRoomAsync(new CreateRoomRequest
         {
             Name = "testRoom"
         });

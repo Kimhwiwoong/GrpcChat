@@ -2,6 +2,11 @@ namespace GrpcChatServer;
 
 public class Client
 {
+    public event Action<MessageContext>? OnSend;
+    
+    public string Peer { get; }
+    public string Name { get; set; }
+    
     public Client(string peer, string name)
     {
         Peer = peer;
@@ -12,8 +17,4 @@ public class Client
     {
         OnSend?.Invoke(context);
     }
-
-    public string Peer { get; }
-    public string Name { get; set; }
-    public event Action<MessageContext>? OnSend;
 }

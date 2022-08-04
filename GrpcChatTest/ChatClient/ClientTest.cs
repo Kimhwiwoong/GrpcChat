@@ -1,6 +1,5 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-using GrpcChat;
 using NUnit.Framework;
 
 namespace GrpcChatTest.ChatClient;
@@ -110,7 +109,7 @@ public class ClientTest
             ChatClientTestUtility.Enroll(_client);
             ChatClientTestUtility.CreateRoom(_client, roomName);
             
-            var call = await ChatClientTestUtility.Enter(_client, "aa");
+            await ChatClientTestUtility.Enter(_client, "aa");
         }
         catch (Exception e)
         {

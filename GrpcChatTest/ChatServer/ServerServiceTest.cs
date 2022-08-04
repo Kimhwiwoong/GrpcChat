@@ -5,7 +5,7 @@ namespace GrpcChatTest.ChatServer;
 
 public class ServerServiceTest
 {
-    private ServerService _service;
+    private ServerService _service = null!;
 
     [SetUp]
     public void Setup()
@@ -37,19 +37,15 @@ public class ServerServiceTest
     //     Assert.AreEqual(newName, client.Name);
     // }
 
-    [TestCase("testRoom")]
-    public void CreateRoomTest(string roomName)
+    [Test]
+    public void CreateRoomTest()
     {
         const string name = "test";
-        var success = "yes";
-        _service.TryCreateRoom(name);
-        
-        if (_service.FindRoom(name) == null)
+        if (!_service.TryCreateRoom(name))
         {
-            success = "no";
+            Assert.Fail();
         }
-
-        Assert.AreEqual("yes",success);
         
+        Assert.Pass();
     }
 }

@@ -1,8 +1,6 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using GrpcChat;
-using GrpcChatServer;
-using NUnit.Framework;
 
 namespace GrpcChatTest;
 
@@ -28,14 +26,14 @@ public static class ChatClientTestUtility
         catch (Exception e)
         {
             Console.WriteLine(e.Message);
-            return null;
+            return null!;
         }
 
         var moveNext = await call.ResponseStream.MoveNext(token);
         if (!moveNext)
         {
-            Console.WriteLine("Movenext is false");
-            return null;
+            Console.WriteLine("MoveNext is false");
+            return null!;
             // throw new Exception("MoveNext is false");   
         }
 
