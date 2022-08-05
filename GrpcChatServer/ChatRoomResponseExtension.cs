@@ -7,15 +7,15 @@ namespace GrpcChatServer;
 public static class ChatRoomResponseExtension
 {
     public static void SendMessage(this IAsyncStreamWriter<ChatRoomResponse> responseStream,
-        MessageContext context)
+        MessageData data)
     {
         responseStream.WriteAsync(new ChatRoomResponse
         {
             Chat = new ChatMessageResponse
             {
-                Message = context.Message,
-                Nickname = context.Sender.Name,
-                Time = Timestamp.FromDateTime(context.Time.ToUniversalTime())
+                Message = data.Message,
+                Nickname = data.Sender.Name,
+                Time = Timestamp.FromDateTime(data.Time.ToUniversalTime())
             }
         }).Wait();
     }

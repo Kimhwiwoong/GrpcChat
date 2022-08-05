@@ -28,7 +28,8 @@ public class RemoveObserver : IObserver<int>, IRemoveEventHandler
     public void OnNext(int duration)
     {
         if (_isWaiting) return;
-        
+
+        _cts = new CancellationTokenSource();
         WaitForRemove(duration, _cts.Token);
     }
 
@@ -39,10 +40,7 @@ public class RemoveObserver : IObserver<int>, IRemoveEventHandler
             return;
         }
         
-        _isWaiting = false;
         _cts.Cancel();
-        
-        _cts = new CancellationTokenSource();
     }
     
     private async void WaitForRemove(int duration, CancellationToken token)

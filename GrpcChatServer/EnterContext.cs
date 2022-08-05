@@ -1,14 +1,14 @@
 namespace GrpcChatServer;
 
-public class EnterContext : IDisposable
+public sealed class EnterContext : IDisposable
 {
     private Client CurrentClient { get; }
 
     private ChatRoom CurrentRoom { get; }
     
-    private readonly Action<MessageContext> _action;
+    private readonly Action<MessageData> _action;
 
-    public EnterContext(Client currentClient, ChatRoom currentRoom, Action<MessageContext> action)
+    public EnterContext(Client currentClient, ChatRoom currentRoom, Action<MessageData> action)
     {
         _action = action;
         CurrentClient = currentClient;
@@ -24,8 +24,6 @@ public class EnterContext : IDisposable
     
     public void Dispose()
     {
-        GC.SuppressFinalize(this);
-        
         CurrentRoom.Exit(CurrentClient.Peer);
         CurrentClient.OnSend -= _action;
     }

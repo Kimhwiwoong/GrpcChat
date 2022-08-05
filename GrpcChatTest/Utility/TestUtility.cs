@@ -1,7 +1,7 @@
 using Grpc.Core;
 using GrpcChatServer;
 
-namespace GrpcChatTest;
+namespace GrpcChatTest.Utility;
 
 public static class TestUtility
 {

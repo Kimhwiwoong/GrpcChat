@@ -1,12 +1,12 @@
 namespace GrpcChatServer;
 
-public class MessageContext
+public class MessageData
 {
     public Client Sender { get; }
     public DateTime Time { get; }
     public string Message { get; }
 
-    public MessageContext(Client sender, DateTime time, string message)
+    public MessageData(Client sender, DateTime time, string message)
     {
         Sender = sender;
         Time = time;

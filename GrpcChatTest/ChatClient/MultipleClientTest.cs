@@ -1,5 +1,6 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using GrpcChatTest.Utility;
 using NUnit.Framework;
 
 namespace GrpcChatTest.ChatClient;

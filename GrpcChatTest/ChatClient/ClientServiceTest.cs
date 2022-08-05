@@ -1,6 +1,7 @@
 using Grpc.Core;
 using GrpcChat;
 using GrpcChat.Exceptions;
+using GrpcChatTest.Utility;
 using NUnit.Framework;
 
 namespace GrpcChatTest.ChatClient;
@@ -137,8 +138,6 @@ public class ClientServiceTest
         const string roomName = "room";
         _clientService.Enroll();
         
-        // Assert.Catch<EnterRoomException>(() => _clientService.EnterRoom(roomName));
-        
         try
         {
             var room = _clientService.EnterRoom(roomName);
@@ -151,15 +150,6 @@ public class ClientServiceTest
         
         Assert.Fail();
     }
-    
-    // 에러 테스트 코드 예시.
-    // public void TestEnroll_InvalidOperationError()
-    // {
-    //     _clientService.UserNickName = "root"; // 1. 에러가 나도록 환경을 조성
-    //
-    //     // 2. 에러를 의도적으로 발생시킨 후, 해당 에러가 정확히 나지 않으면 fail.
-    //     Assert.Catch<InvalidOperationException>(() => _clientService.Enroll());
-    // }
 
     [Test]
     public void TestSendChat()

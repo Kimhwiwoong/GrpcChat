@@ -163,7 +163,7 @@ public class ClientController
             Console.Clear();
             Console.WriteLine($"_______________Entered {roomName}_______________");
             
-            room.OnMessage += (message) =>
+            room.OnMessage += message =>
             {
                 Console.WriteLine(message);
             };

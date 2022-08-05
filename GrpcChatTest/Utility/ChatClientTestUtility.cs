@@ -2,7 +2,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using GrpcChat;
 
-namespace GrpcChatTest;
+namespace GrpcChatTest.Utility;
 
 public static class ChatClientTestUtility
 {
