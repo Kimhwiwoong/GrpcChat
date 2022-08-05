@@ -102,15 +102,14 @@ public class ClientService
             throw new InvalidOperationException();
 
         var reply = call.ResponseStream.Current;
-        if (reply is not { Enter: { } enter })
-            throw new InvalidOperationException();
 
-        return enter.ResponseCase switch
-        {
-            SuccessFailResponse.ResponseOneofCase.Success => new Room(call),
-            SuccessFailResponse.ResponseOneofCase.Failed => throw new EnterRoomException(enter.Failed.Reason),
-            _ => throw new InvalidOperationException()
-        };
+        if (reply is { Failed: { } failed })
+            throw new EnterRoomException(failed.Reason);
+        
+        if (reply is not { Enter: { } enter })
+            throw new EnterRoomException("Invalid reply: reply is not type enter.");
+
+        return new Room(call);
     }
 
     public string GetCurrentNickname()

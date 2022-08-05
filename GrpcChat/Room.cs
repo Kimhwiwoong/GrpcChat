@@ -2,7 +2,7 @@ using Grpc.Core;
 
 namespace GrpcChat;
 
-public class Room
+public sealed class Room : IDisposable
 {
     public event Action<string>? OnMessage;
     
@@ -31,10 +31,7 @@ public class Room
 
     public void Exit()
     {
-        _call.RequestStream.CompleteAsync().Wait();
-        _readingTask.Wait();
-        
-        _call.Dispose();
+        Dispose();
     }
     
     private async Task ReadAsync()
@@ -53,5 +50,14 @@ public class Room
             }
             OnMessage?.Invoke(_call.ResponseStream.Current.Failed.Reason);
         }
+    }
+
+    public void Dispose()
+    {
+        _call.RequestStream.CompleteAsync().Wait();
+        _readingTask.Wait();
+        
+        _call.Dispose();
+        _readingTask.Dispose();
     }
 }

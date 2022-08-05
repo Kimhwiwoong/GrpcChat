@@ -16,7 +16,7 @@ public class ChatRoom
 
     private readonly RemoveObserver _removeObserver = new();
     
-    public EnterContext Enter(Client client, Action<MessageData> action)
+    public EnterContext Enter(Client client, Action<MessageData> onSendHandler)
     {
         _clients.TryAdd(client.Peer, client);
 
@@ -24,7 +24,7 @@ public class ChatRoom
 
         Console.WriteLine($"Client {client.Name} entered room {Name}.");
 
-        return new EnterContext(client, this, action);
+        return new EnterContext(client, this, onSendHandler);
     }
 
     public void Exit(string peer)

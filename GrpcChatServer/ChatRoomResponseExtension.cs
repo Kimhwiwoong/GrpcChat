@@ -9,6 +9,7 @@ public static class ChatRoomResponseExtension
     public static void SendMessage(this IAsyncStreamWriter<ChatRoomResponse> responseStream,
         MessageData data)
     {
+        Console.WriteLine("A");
         responseStream.WriteAsync(new ChatRoomResponse
         {
             Chat = new ChatMessageResponse
@@ -18,6 +19,7 @@ public static class ChatRoomResponseExtension
                 Time = Timestamp.FromDateTime(data.Time.ToUniversalTime())
             }
         }).Wait();
+        Console.WriteLine("B");
     }
     
     
@@ -40,10 +42,7 @@ public static class ChatRoomResponseExtension
         responseStream.WriteAsync(
             new ChatRoomResponse
             {
-                Enter = new SuccessFailResponse
-                {
-                    Success = new Empty()
-                }
+                Enter = new Empty()
             }
         ).Wait();
     }

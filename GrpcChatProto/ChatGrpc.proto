@@ -47,7 +47,7 @@ message ChatRoomRequest {
 
 message ChatRoomResponse {
   oneof response {
-    SuccessFailResponse enter = 1;
+    google.protobuf.Empty enter = 1;
     ChatMessageResponse chat = 2;
     FailedResponse failed = 3;
   }

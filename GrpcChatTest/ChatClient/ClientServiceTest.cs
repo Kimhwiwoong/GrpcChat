@@ -137,18 +137,12 @@ public class ClientServiceTest
     {
         const string roomName = "room";
         _clientService.Enroll();
-        
-        try
+
+        Assert.Catch<EnterRoomException>(() =>
         {
             var room = _clientService.EnterRoom(roomName);
             room.Exit();
-        }
-        catch (EnterRoomException e)
-        {
-            Assert.Pass(e.Message);
-        }
-        
-        Assert.Fail();
+        });
     }
 
     [Test]

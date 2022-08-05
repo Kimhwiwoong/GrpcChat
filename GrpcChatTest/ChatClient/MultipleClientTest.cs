@@ -5,6 +5,7 @@ using NUnit.Framework;
 
 namespace GrpcChatTest.ChatClient;
 
+[Timeout(10000)]
 public class MultipleClientTest
 {
     private ChatGrpc.ChatGrpcClient _client1 = null!;
@@ -18,64 +19,42 @@ public class MultipleClientTest
     [SetUp]
     public void Setup()
     {
+        Console.WriteLine(1);
+        
         _server = TestUtility.CreateServer(12345);
+        
+        Console.WriteLine(2);
+        
         _server.Start();
+        
+        Console.WriteLine(3);
 
         (_channel1, _client1) = TestUtility.CreateClient(12345, "client1");
+        
+        Console.WriteLine(4);
+        
         (_channel2, _client2) = TestUtility.CreateClient(12345, "client2");
+
+        Console.WriteLine("SETUP COMPLETE");
     }
 
     [TearDown]
     public void TearDown()
     {
+        Console.WriteLine("TEARDOWN");
+        
         Task.WhenAll(
             _channel1.ShutdownAsync(),
             _channel2.ShutdownAsync()
         ).Wait();
-        
-        
-        _server.KillAsync().Wait();
+
+        _server.ShutdownAsync().Wait();
+
+        Console.WriteLine("TEARDOWN COMPLETE");
     }
 
-    // [Test]
-    // public void MasonTest()
-    // {
-    //     _client1.Enroll(new Empty());
-    //     _client2.Enroll(new Empty());
-    //
-    //     _client1.CreateRoom(new CreateRoomRequest { Name = "test" });
-    //
-    //     var call1 = _client1.EnterRoom();
-    //     var call2 = _client2.EnterRoom();
-    //
-    //     call1.RequestStream.WriteAsync(new ChatRoomRequest
-    //     {
-    //         Enter = new EnterRoomRequest
-    //         {
-    //             RoomName = "test"
-    //         }
-    //     });
-    //
-    //     if (!call1.ResponseStream.MoveNext().Result)
-    //     {
-    //         Assert.Fail("Enter room of call 1 failed.");
-    //     }
-    //
-    //     call2.RequestStream.WriteAsync(new ChatRoomRequest
-    //     {
-    //         Enter = new EnterRoomRequest
-    //         {
-    //             RoomName = "test"
-    //         }
-    //     });
-    //
-    //     if (!call2.ResponseStream.MoveNext().Result)
-    //     {
-    //         Assert.Fail("Enter room of call 2 failed.");
-    //     }
-    // }
-
     [Test]
+    [Repeat(80)]
     public async Task TestEnterRoom()
     {
         var cts = new CancellationTokenSource();
@@ -98,8 +77,8 @@ public class MultipleClientTest
         });
 
         // var calls = await Task.WhenAll(
-        var call1 = await ChatClientTestUtility.Enter(_client1, testRoom, token);
-        var call2 = await ChatClientTestUtility.Enter(_client2, testRoom, token);
+        using var call1 = await ChatClientTestUtility.Enter(_client1, testRoom, token);
+        using var call2 = await ChatClientTestUtility.Enter(_client2, testRoom, token);
 
         // );
 

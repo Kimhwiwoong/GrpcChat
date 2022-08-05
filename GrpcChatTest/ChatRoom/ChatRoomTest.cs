@@ -52,44 +52,31 @@ public class ChatRoomTest
     [Test]
     public async Task TestAsyncEnter()
     {
-        var tasks = new Task[10];
-        var tasks1 = new Task[10];
+        const int taskAmount = 20;
+        const int iteration = 1000;
         
-        for (var i = 0; i < 10; ++i)
+        var tasks = new Task[taskAmount];
+
+        for (var i = 0; i < taskAmount; ++i)
         {
-            tasks[i] = EnterMany();
+            tasks[i] = EnterMany(i * 10000, iteration);
             tasks[i].Start();
-            
-            tasks1[i] = EnterMany1();
-            tasks1[i].Start();
         }
 
         await Task.WhenAll(tasks);
-        await Task.WhenAll(tasks1);
-        
-        Assert.AreEqual(20,_room.ParticipantsCount());
+
+        Assert.AreEqual(taskAmount * iteration,_room.ParticipantsCount());
     }
 
-    private Task EnterMany()
+    private Task EnterMany(int offset, int amount)
     {
         return new Task(() =>
         {
-            for (var i = 0; i < 10; ++i)
+            for (var i = 0; i < amount; ++i)
             {
-                Thread.Sleep(50);
-                _room.Enter(new Client(i.ToString(), i.ToString()), TestAction);
-            }
-        });
-    }
-    
-    private Task EnterMany1()
-    {
-        return new Task(() =>
-        {
-            for (var i = 100; i > 90; i--)
-            {
-                Thread.Sleep(50);
-                _room.Enter(new Client(i.ToString(), i.ToString()), TestAction);
+                var id = (i + offset).ToString();
+                
+                _room.Enter(new Client(id, id), TestAction);
             }
         });
     }
@@ -141,22 +128,21 @@ public class ChatRoomTest
     {
         var messagesFromClient1 = new List<string>();
 
-        _room.Enter(_testClient1, TestAction);
-        _room.Enter(_testClient2, TestAction);
-
-        _testClient1.OnSend += OnSendHandler;
+        _room.Enter(_testClient1, OnSendHandler);
+        _room.Enter(_testClient2, OnSendHandler);
 
         for (var i = 0; i < count; i++)
         {
             _room.Broadcast(_testClient1.Peer, "testMessage");
         }
 
-        _testClient1.OnSend -= OnSendHandler;
-        
-        
         Assert.AreEqual(count, messagesFromClient1.Count);
 
-        void OnSendHandler(MessageData context) => messagesFromClient1.Add(context.Message);
+        void OnSendHandler(MessageData context)
+        {
+            Console.WriteLine("Invoked!");
+            messagesFromClient1.Add(context.Message);
+        }
     }
 
     [TestCase(3,ExpectedResult = 6)]
@@ -184,30 +170,55 @@ public class ChatRoomTest
 
         return prevChatQueue.Count;
     }
+
+    private void AddFunctionHandler(TaskCompletionSource tcs)
+    {
+        _testRoomList.TryRemove("newRoom", out _);
+        Console.WriteLine("OnRemove called");
+        tcs.SetResult();
+    }
     
     [Test]
     public async Task TestActionCalled()
     {
         _testRoomList.Clear();
+        
         var tcs = new TaskCompletionSource();
         var newRoom = new GrpcChatServer.ChatRoom("newRoom");
-        
-        newRoom.Handler.OnRemove += () =>
-        {
-            _testRoomList.TryRemove("newRoom", out _);
-            Console.WriteLine("OnRemove called");
-            tcs.SetResult();
-        };
+
+        newRoom.Handler.OnRemove += () => AddFunctionHandler(tcs);
         
         _testRoomList.TryAdd("newRoom", newRoom);
 
         newRoom.Enter(_testClient1, TestAction);
-        var afterEnter = _testRoomList.Count;
+        var expected = _testRoomList.Count - 1;
 
         newRoom.Exit(_testClient1.Peer);
         await tcs.Task;
+        
         var afterExit = _testRoomList.Count;
         
-        Assert.AreNotEqual(afterExit, afterEnter);
+        Assert.AreEqual(expected, afterExit);
+    }
+    
+    [Test]
+    public async Task TestActionCalledCreated()
+    {
+        _testRoomList.Clear();
+        
+        var tcs = new TaskCompletionSource();
+        var newRoom = new GrpcChatServer.ChatRoom("newRoom");
+
+        newRoom.Handler.OnRemove += () => AddFunctionHandler(tcs);
+        
+        _testRoomList.TryAdd("newRoom", newRoom);
+        
+        var expected = _testRoomList.Count - 1;
+        
+        await tcs.Task;
+        
+        var after = _testRoomList.Count;
+        
+        Assert.AreEqual(expected, after);
     }
 }

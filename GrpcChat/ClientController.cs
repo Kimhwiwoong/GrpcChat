@@ -158,7 +158,7 @@ public class ClientController
 
         try
         {
-            var room = _clientService.EnterRoom(roomName!);
+            using var room = _clientService.EnterRoom(roomName!);
             
             Console.Clear();
             Console.WriteLine($"_______________Entered {roomName}_______________");
@@ -182,8 +182,6 @@ public class ClientController
 
                 room.SendMessage(line!);
             }
-            
-            room.Exit();
         }
         catch (Exception e)
         {

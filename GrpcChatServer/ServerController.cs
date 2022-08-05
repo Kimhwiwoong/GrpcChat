@@ -101,7 +101,7 @@ public class ServerController : ChatGrpc.ChatGrpcBase
                 throw new ServerException("WARNING: Need EnterRequest.");
 
             var roomName = requestStream.Current.Enter.RoomName;
-            
+
             var room = _serverService.FindRoom(roomName);
 
             using var enter = room.Enter(client, responseStream.SendMessage);
@@ -130,6 +130,10 @@ public class ServerController : ChatGrpc.ChatGrpcBase
         catch (ServerException e)
         {
             responseStream.SendFail(e);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
         }
     }
 }

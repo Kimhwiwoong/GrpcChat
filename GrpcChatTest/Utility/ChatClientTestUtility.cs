@@ -40,7 +40,9 @@ public static class ChatClientTestUtility
         var reply = call.ResponseStream.Current;
 
         if (reply.ResponseCase != ChatRoomResponse.ResponseOneofCase.Enter)
-            throw new Exception("Wrong response on EnterRequest");
+        {
+            Console.WriteLine(reply.ResponseCase);
+        }
 
         return call;
     }
