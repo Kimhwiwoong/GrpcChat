@@ -18,7 +18,7 @@ public class ClientServiceTest
     {
         _server = TestUtility.CreateServer(12345);
         _server.Start();
-        (_channel, _client) = TestUtility.CreateClient(12345);
+        (_client, _channel) = TestUtility.CreateClient(12345);
         _clientService = new ClientService(_client);
     }
 

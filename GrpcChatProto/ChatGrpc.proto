@@ -8,6 +8,7 @@ service ChatGrpc {
   rpc CreateRoom (CreateRoomRequest) returns (SuccessFailResponse);
   rpc ShowRooms (google.protobuf.Empty) returns (ShowRoomsResponse);
   rpc EnterRoom (stream ChatRoomRequest) returns (stream ChatRoomResponse);
+  rpc SendPrevChats (google.protobuf.Empty) returns (PrevChatsResponse);
 }
 
 
@@ -45,13 +46,23 @@ message ChatRoomRequest {
   }
 }
 
+//message ChatRoomResponse {
+//  oneof response {
+//    google.protobuf.Empty enter = 1;
+//    ChatMessageResponse chat = 2;
+//    FailedResponse failed = 3;
+//  }
+//}
+
 message ChatRoomResponse {
   oneof response {
-    google.protobuf.Empty enter = 1;
+    PrevChatsResponse prev_chats= 1;
     ChatMessageResponse chat = 2;
     FailedResponse failed = 3;
   }
 }
+
+
 
 // ChatMessage
 message ChatMessageRequest {
@@ -62,6 +73,15 @@ message ChatMessageResponse {
   string message = 1;
   google.protobuf.Timestamp time = 2;
   string nickname = 3;
+}
+
+// PrevChat
+message PrevChatsRequest {
+  string room_name = 1;
+}
+
+message PrevChatsResponse {
+  repeated ChatMessageResponse prev_chats = 1;
 }
 
 

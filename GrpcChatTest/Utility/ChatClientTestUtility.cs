@@ -39,7 +39,7 @@ public static class ChatClientTestUtility
 
         var reply = call.ResponseStream.Current;
 
-        if (reply.ResponseCase != ChatRoomResponse.ResponseOneofCase.Enter)
+        if (reply.ResponseCase != ChatRoomResponse.ResponseOneofCase.PrevChats)
         {
             Console.WriteLine(reply.ResponseCase);
         }
@@ -63,9 +63,6 @@ public static class ChatClientTestUtility
         client.Enroll(request);
     }
 
-    
-    
-    
     // 얘는 clientService용인데??
     public static void EnrollAndCreateRoom(string name, ClientService clientService)
     {

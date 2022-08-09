@@ -1,3 +1,4 @@
+using Google.Protobuf.Collections;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using GrpcChatServer.Exceptions;
@@ -9,41 +10,70 @@ public static class ChatRoomResponseExtension
     public static void SendMessage(this IAsyncStreamWriter<ChatRoomResponse> responseStream,
         MessageData data)
     {
-        Console.WriteLine("A");
-        responseStream.WriteAsync(new ChatRoomResponse
+        var uuid = Random.Shared.Next();
+
+        lock (responseStream)
         {
-            Chat = new ChatMessageResponse
+            // Console.WriteLine($"{data.Sender.Peer}: {data.Message} / {uuid} START");
+            responseStream.WriteAsync(new ChatRoomResponse
             {
-                Message = data.Message,
-                Nickname = data.Sender.Name,
-                Time = Timestamp.FromDateTime(data.Time.ToUniversalTime())
-            }
-        }).Wait();
-        Console.WriteLine("B");
+                Chat = new ChatMessageResponse
+                {
+                    Message = data.Message,
+                    Nickname = data.Sender.Name,
+                    Time = Timestamp.FromDateTime(data.Time.ToUniversalTime())
+                }
+            }).Wait();
+        }
+        
+        // Console.WriteLine($"{data.Sender.Peer}: {data.Message} / {uuid} END");
     }
     
     
-    // Adaptor
+    // Adapter
     public static void SendFail(this IAsyncStreamWriter<ChatRoomResponse> responseStream, ServerException e)
     {
-        responseStream.WriteAsync(
-            new ChatRoomResponse
-            {
-                Failed = new FailedResponse
+        lock (responseStream)
+        {
+            responseStream.WriteAsync(
+                new ChatRoomResponse
                 {
-                    Reason = e.Message
+                    Failed = new FailedResponse
+                    {
+                        Reason = e.Message
+                    }
                 }
-            }
-        ).Wait();
+            ).Wait();
+        }
     }
 
-    public static void SendEnter(this IAsyncStreamWriter<ChatRoomResponse> responseStream)
+    public static async Task SendEnter(this IAsyncStreamWriter<ChatRoomResponse> responseStream, ChatRoom room)
     {
-        responseStream.WriteAsync(
-            new ChatRoomResponse
+        var messageList = new RepeatedField<ChatMessageResponse>();
+        
+        foreach (var message in room.GetPrevChats())
+        {
+            messageList.Add(new ChatMessageResponse
             {
-                Enter = new Empty()
-            }
-        ).Wait();
+                Message = message.Message,
+                Nickname = message.Sender.Name,
+                Time = message.Time.ToUniversalTime().ToTimestamp()
+            });
+        }
+
+        lock (responseStream)
+        {
+            responseStream.WriteAsync(
+                new ChatRoomResponse
+                {
+                    PrevChats = new PrevChatsResponse
+                    {
+                        PrevChats = { messageList }
+                    }
+                }
+            ).Wait();
+        }
+
+        await Task.Delay(100);
     }
 }

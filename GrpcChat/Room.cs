@@ -9,11 +9,14 @@ public sealed class Room : IDisposable
     private readonly AsyncDuplexStreamingCall<ChatRoomRequest, ChatRoomResponse> _call;
     
     private readonly Task _readingTask;
+
+    private readonly List<string> _prevChats;
     
-    public Room(AsyncDuplexStreamingCall<ChatRoomRequest, ChatRoomResponse> call)
+    public Room(AsyncDuplexStreamingCall<ChatRoomRequest, ChatRoomResponse> call, List<string> prevChats)
     {
         _call = call;
         _readingTask = ReadAsync();
+        _prevChats = prevChats;
     }
 
     public void SendMessage(string commands)
@@ -34,6 +37,20 @@ public sealed class Room : IDisposable
         Dispose();
     }
     
+    public void Dispose()
+    {
+        _call.RequestStream.CompleteAsync().Wait();
+        _readingTask.Wait();
+        
+        _call.Dispose();
+        _readingTask.Dispose();
+    }
+
+    public List<string> GetPrevChats()
+    {
+        return _prevChats;
+    }
+    
     private async Task ReadAsync()
     {
         while (await _call.ResponseStream.MoveNext())
@@ -50,14 +67,5 @@ public sealed class Room : IDisposable
             }
             OnMessage?.Invoke(_call.ResponseStream.Current.Failed.Reason);
         }
-    }
-
-    public void Dispose()
-    {
-        _call.RequestStream.CompleteAsync().Wait();
-        _readingTask.Wait();
-        
-        _call.Dispose();
-        _readingTask.Dispose();
     }
 }

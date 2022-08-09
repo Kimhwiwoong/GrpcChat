@@ -163,6 +163,13 @@ public class ClientController
             Console.Clear();
             Console.WriteLine($"_______________Entered {roomName}_______________");
             
+            // var list = _clientService.GetPrevChats();
+            // PrintPrevChat(list);
+            foreach (var chat in room.GetPrevChats())
+            {
+                Console.WriteLine(chat);
+            }
+            
             room.OnMessage += message =>
             {
                 Console.WriteLine(message);
@@ -186,6 +193,14 @@ public class ClientController
         catch (Exception e)
         {
             Console.WriteLine(e.Message);
+        }
+    }
+
+    private static void PrintPrevChat(IEnumerable<string> chatList)
+    {
+        foreach (var chat in chatList)
+        {
+            Console.WriteLine(chat);
         }
     }
 }

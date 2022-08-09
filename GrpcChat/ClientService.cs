@@ -101,16 +101,40 @@ public class ClientService
         if (!call.ResponseStream.MoveNext().Result)
             throw new InvalidOperationException();
 
-        var reply = call.ResponseStream.Current;
+        var response = call.ResponseStream.Current;
 
-        if (reply is { Failed: { } failed })
+        if (response is { Failed: { } failed })
             throw new EnterRoomException(failed.Reason);
         
-        if (reply is not { Enter: { } enter })
+        if (response is not { PrevChats: { } })
             throw new EnterRoomException("Invalid reply: reply is not type enter.");
-
-        return new Room(call);
+        
+        // 이부분에서 response로 받은 prevChats 처리
+        var prevChats = response.PrevChats.PrevChats
+            .Select(prevChatResponse =>
+                $"[{prevChatResponse.Time.ToDateTime().ToLocalTime()}] " +
+                $"{prevChatResponse.Nickname} : {prevChatResponse.Message}")
+            .ToList();
+        
+        
+        return new Room(call, prevChats);
     }
+
+    // public IEnumerable<string> GetPrevChats()
+    // {
+    //     var request = new Empty();
+    //     // var request = new PrevChatsRequest
+    //     // {
+    //     //     RoomName = roomName
+    //     // };
+    //     var reply = _client.SendPrevChats(request);
+    //
+    //     return reply.PrevChats
+    //         .Select(prevChatResponse =>
+    //             $"[{prevChatResponse.Time.ToDateTime().ToLocalTime()}] " +
+    //             $"{prevChatResponse.Nickname} : {prevChatResponse.Message}")
+    //         .ToList();
+    // }
 
     public string GetCurrentNickname()
     {

@@ -59,8 +59,6 @@ public class ServerController : ChatGrpc.ChatGrpcBase
 
         reply.Success = new Empty();
         
-        //_serverService.CheckRemoveRoom(request.Name);
-        
         return Task.FromResult(reply);
     }
 
@@ -105,8 +103,9 @@ public class ServerController : ChatGrpc.ChatGrpcBase
             var room = _serverService.FindRoom(roomName);
 
             using var enter = room.Enter(client, responseStream.SendMessage);
-            responseStream.SendEnter();
-
+            
+            await responseStream.SendEnter(room);
+            
             enter.Initialize();
 
             // Case of only ChatRequest type.
@@ -121,7 +120,7 @@ public class ServerController : ChatGrpc.ChatGrpcBase
                     responseStream.SendFail(new ServerException("Unexpected error"));
                     continue;
                 }
-
+                
                 var chatMessage = requestStream.Current.Chat.Message;
 
                 enter.Broadcast(chatMessage);
@@ -133,7 +132,36 @@ public class ServerController : ChatGrpc.ChatGrpcBase
         }
         catch (Exception e)
         {
+            // Send fail 넣기.
             Console.WriteLine(e);
         }
     }
+
+    // public override Task<PrevChatsResponse> SendPrevChats(Empty request, ServerCallContext context)
+    // {
+    //     // context peer 갖고있음
+    //     Console.WriteLine("stop");
+    //     var room = null;
+    //     
+    //     var messageList = new RepeatedField<ChatMessageResponse>();
+    //
+    //     foreach (var message in room.GetPrevChats())
+    //     {
+    //         messageList.Add(new ChatMessageResponse
+    //         {
+    //             Message = message.Message,
+    //             Nickname = message.Sender.Name,
+    //             Time = message.Time.ToTimestamp()
+    //         });
+    //     }
+    //
+    //     Console.WriteLine(messageList.Count);
+    //
+    //     var reply = new PrevChatsResponse
+    //     {
+    //         PrevChats = { messageList }
+    //     };
+    //
+    //     return Task.FromResult(reply);
+    // }
 }

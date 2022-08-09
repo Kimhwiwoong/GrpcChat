@@ -22,7 +22,7 @@ public class ChatRoom
 
         _removeObserver.Cancel();
 
-        Console.WriteLine($"Client {client.Name} entered room {Name}.");
+        //Console.WriteLine($"Client {client.Name} entered room {Name}.");
 
         return new EnterContext(client, this, onSendHandler);
     }
@@ -51,9 +51,9 @@ public class ChatRoom
             _previousChats.TryDequeue(out _);
         }
 
-        var context = new MessageData(_clients[peer], DateTime.Now, message);
+        var messageData = new MessageData(_clients[peer], DateTime.Now, message);
 
-        _previousChats.Enqueue(context);
+        _previousChats.Enqueue(messageData);
 
         var others = _clients
             .Where(clientPair => clientPair.Key != peer)
@@ -61,18 +61,23 @@ public class ChatRoom
         
         foreach (var other in others)
         {
-            other.Send(context);
+            other.Send(messageData);
         }
     }
 
-    public void SendPrevChat(string peer)
+    // public void SendPrevChat(string peer)
+    // {
+    //     if (!_clients.TryGetValue(peer, out var currentClient)) return;
+    //
+    //     foreach (var chat in _previousChats)
+    //     {
+    //         currentClient.Send(chat);
+    //     }
+    // }
+
+    public ConcurrentQueue<MessageData> GetPrevChats()
     {
-        if (!_clients.TryGetValue(peer, out var currentClient)) return;
-        
-        foreach (var chat in _previousChats)
-        {
-            currentClient.Send(chat);
-        }
+        return _previousChats;
     }
 
     public ChatRoom(string chatRoomName)

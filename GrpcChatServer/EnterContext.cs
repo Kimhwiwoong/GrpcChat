@@ -31,10 +31,6 @@ public sealed class EnterContext : IDisposable
     public void Initialize()
     {
         var clientEnterMessage = $"{CurrentClient.Name} Entered ChatRoom";
-
-        // Load previous 10(able to set in ChatRoom class) chats.
-        CurrentRoom.SendPrevChat(CurrentClient.Peer);
-        
         Broadcast(clientEnterMessage);
     }
 }
