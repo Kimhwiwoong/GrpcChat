@@ -22,7 +22,7 @@ public class ChatRoom
 
         _removeObserver.Cancel();
 
-        //Console.WriteLine($"Client {client.Name} entered room {Name}.");
+        Console.WriteLine($"Client {client.Name} entered room {Name}.");
 
         return new EnterContext(client, this, onSendHandler);
     }

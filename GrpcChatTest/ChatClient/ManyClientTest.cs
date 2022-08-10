@@ -7,7 +7,7 @@ namespace GrpcChatTest.ChatClient;
 
 public class ManyClientTest
 {
-    private const int TestCount = 5;
+    private const int TestCount = 10;
 
     private Server _server = null!;
     private Dictionary<ChatGrpc.ChatGrpcClient, Channel> _clientChannels = null!;

@@ -196,11 +196,11 @@ public class ClientController
         }
     }
 
-    private static void PrintPrevChat(IEnumerable<string> chatList)
-    {
-        foreach (var chat in chatList)
-        {
-            Console.WriteLine(chat);
-        }
-    }
+    // private static void PrintPrevChat(IEnumerable<string> chatList)
+    // {
+    //     foreach (var chat in chatList)
+    //     {
+    //         Console.WriteLine(chat);
+    //     }
+    // }
 }

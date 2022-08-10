@@ -47,7 +47,7 @@ public static class ChatRoomResponseExtension
         }
     }
 
-    public static async Task SendEnter(this IAsyncStreamWriter<ChatRoomResponse> responseStream, ChatRoom room)
+    public static void SendEnter(this IAsyncStreamWriter<ChatRoomResponse> responseStream, ChatRoom room)
     {
         var messageList = new RepeatedField<ChatMessageResponse>();
         
@@ -73,7 +73,5 @@ public static class ChatRoomResponseExtension
                 }
             ).Wait();
         }
-
-        await Task.Delay(100);
     }
 }

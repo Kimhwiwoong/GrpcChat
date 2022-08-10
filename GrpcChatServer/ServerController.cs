@@ -104,7 +104,7 @@ public class ServerController : ChatGrpc.ChatGrpcBase
 
             using var enter = room.Enter(client, responseStream.SendMessage);
             
-            await responseStream.SendEnter(room);
+            responseStream.SendEnter(room);
             
             enter.Initialize();
 
