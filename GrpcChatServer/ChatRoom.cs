@@ -9,7 +9,7 @@ public class ChatRoom
     public string Name { get; }
 
     private const int QueueSize = 10;
-    private const int WaitDurationMilli = 5000;
+    private const int WaitDurationMilli = 10000;
     
     private readonly ConcurrentDictionary<string, Client> _clients = new();
     private readonly ConcurrentQueue<MessageData> _previousChats = new();

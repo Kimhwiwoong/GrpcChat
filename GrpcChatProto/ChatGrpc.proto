@@ -46,6 +46,13 @@ message ChatRoomRequest {
   }
 }
 
+message ChatRoomResponse {
+  oneof response {
+    PrevChatsResponse prev_chats= 1;
+    ChatMessageResponse chat = 2;
+    FailedResponse failed = 3;
+  }
+}
 //message ChatRoomResponse {
 //  oneof response {
 //    google.protobuf.Empty enter = 1;
@@ -54,13 +61,7 @@ message ChatRoomRequest {
 //  }
 //}
 
-message ChatRoomResponse {
-  oneof response {
-    PrevChatsResponse prev_chats= 1;
-    ChatMessageResponse chat = 2;
-    FailedResponse failed = 3;
-  }
-}
+
 
 
 

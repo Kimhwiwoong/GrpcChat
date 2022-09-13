@@ -1,6 +1,7 @@
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using GrpcChat.Exceptions;
+using GrpcChatProto;
 
 namespace GrpcChat;
 
@@ -23,7 +24,7 @@ public class ClientService
         {
             throw new Exception("Enroll reply is null");
         }
-
+        
         _userNickname = reply.Nickname;
     }
     
@@ -76,14 +77,12 @@ public class ClientService
 
     }
     
-    public IEnumerable<string> ShowRooms()
+    public IEnumerable<IRoomInformation> ShowRooms()
     {
         var request = new Empty();
         var reply = _client.ShowRooms(request);
 
-        return reply.RoomInfos
-            .Select(infoResponse => $"{infoResponse.Name} ({infoResponse.ParticipantsCount})")
-            .ToList();
+        return reply.RoomInfos;
     }
 
     public Room EnterRoom(string roomName)
@@ -112,7 +111,7 @@ public class ClientService
         // 이부분에서 response로 받은 prevChats 처리
         var prevChats = response.PrevChats.PrevChats
             .Select(prevChatResponse =>
-                $"[{prevChatResponse.Time.ToDateTime().ToLocalTime()}] " +
+                $"[{prevChatResponse.Time.ToDateTime().ToLocalTime():yyyy-M-d dddd hh:mm:ss}] " +
                 $"{prevChatResponse.Nickname} : {prevChatResponse.Message}")
             .ToList();
         

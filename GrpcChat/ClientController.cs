@@ -5,12 +5,13 @@ namespace GrpcChat;
 public class ClientController
 {
     private readonly ClientService _clientService;
+    private bool _continue = true;
     
     public void Start()
     {
         Enroll();
         
-        while (true)
+        while (_continue)
         {
             try
             {
@@ -34,6 +35,7 @@ public class ClientController
                         
                     case "exit":
                         Console.WriteLine("GoodBye");
+                        _continue = false;
                         continue;
                     
                     case "clear":
@@ -64,7 +66,7 @@ public class ClientController
     private void Enroll()
     {
         _clientService.Enroll();
-        
+
         PrintCommands();
     }
 
@@ -147,7 +149,7 @@ public class ClientController
         var roomsInfo = _clientService.ShowRooms();
         foreach (var room in roomsInfo)
         {
-            Console.WriteLine(room);
+            Console.WriteLine($"{room.Name} ({room.ParticipantsCount})");
         }
     }
 
